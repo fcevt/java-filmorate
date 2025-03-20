@@ -62,7 +62,7 @@ public class UserController {
             log.warn("Дата рождения задана в будущем");
             throw new ValidationException("Дата рождения не может быть в будущем");
         }
-        if ( user.getEmail() == null || (!user.getEmail().contains("@")) || user.getEmail().isBlank()) {
+        if (user.getEmail() == null || (!user.getEmail().contains("@")) || user.getEmail().isBlank()) {
             log.warn("электронная почта пустая или не содержит символ @");
             throw new ValidationException("электронная почта не может быть пустой и должна содержать символ @");
         }
