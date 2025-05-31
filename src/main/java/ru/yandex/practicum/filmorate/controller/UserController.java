@@ -14,46 +14,46 @@ import java.util.*;
 @RequestMapping("/users")
 public class UserController {
 
-    private long id = 0;
-    private final Map<Long, User> users = new HashMap<>();
+//    private long id = 0;
+//    private final Map<Long, User> users = new HashMap<>();
 
     @GetMapping
-    public List<User> findAll() {
-        return new ArrayList<>(users.values());
-    }
+//    public List<User> findAll() {
+//        return new ArrayList<>(users.values());
+//    }
 
     @PostMapping
-    public User create(@Valid @RequestBody User user) {
-        validateUser(user);
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
-        user.setId(++id);
-        users.put(user.getId(), user);
-        log.debug("Создан пользователь {}", user);
-        return user;
-    }
+//    public User create(@Valid @RequestBody User user) {
+//        validateUser(user);
+//        if (user.getName() == null || user.getName().isBlank()) {
+//            user.setName(user.getLogin());
+//        }
+//        user.setId(++id);
+//        users.put(user.getId(), user);
+//        log.debug("Создан пользователь {}", user);
+//        return user;
+//    }
 
     @PutMapping
-    public User update(@Valid @RequestBody User user) {
-        if (users.containsKey(user.getId())) {
-            validateUser(user);
-            User oldUser = users.get(user.getId());
-            oldUser.setLogin(user.getLogin());
-            oldUser.setBirthday(user.getBirthday());
-            oldUser.setEmail(user.getEmail());
-            oldUser.setName(user.getName());
-            log.debug("Обновлен пользователь {}", oldUser);
-            return oldUser;
-        }
-        log.warn("Пользователь с id={} не найден", user.getId());
-        throw new NotFoundException("Пользователь с id=" + user.getId() + " не найден");
-    }
-
-    private void validateUser(User user) {
-        if (user.getLogin().contains(" ")) {
-            log.warn("Логин содержит пробелы");
-            throw new ValidationException("Логин не может содержать пробелы");
-        }
-    }
+//    public User update(@Valid @RequestBody User user) {
+//        if (users.containsKey(user.getId())) {
+//            validateUser(user);
+//            User oldUser = users.get(user.getId());
+//            oldUser.setLogin(user.getLogin());
+//            oldUser.setBirthday(user.getBirthday());
+//            oldUser.setEmail(user.getEmail());
+//            oldUser.setName(user.getName());
+//            log.debug("Обновлен пользователь {}", oldUser);
+//            return oldUser;
+//        }
+//        log.warn("Пользователь с id={} не найден", user.getId());
+//        throw new NotFoundException("Пользователь с id=" + user.getId() + " не найден");
+//    }
+//
+//    private void validateUser(User user) {
+//        if (user.getLogin().contains(" ")) {
+//            log.warn("Логин содержит пробелы");
+//            throw new ValidationException("Логин не может содержать пробелы");
+//        }
+//    }
 }
