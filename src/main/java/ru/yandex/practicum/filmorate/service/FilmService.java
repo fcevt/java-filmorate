@@ -21,6 +21,22 @@ public class FilmService {
         this.userStorage = userStorage;
     }
 
+    public List<Film> getFilms() {
+        return filmStorage.findAll();
+    }
+
+    public Film getFilmById(int id) {
+        return filmStorage.findById(id);
+    }
+
+    public Film createFilm(Film film) {
+        return filmStorage.create(film);
+    }
+
+    public Film updateFilm(Film film) {
+        return filmStorage.update(film);
+    }
+
     public void addLike(Long filmId, Long userId) {
         Film film = filmStorage.findById(filmId);
         userStorage.findById(userId); //для проверки, что юзер существует
@@ -35,7 +51,8 @@ public class FilmService {
 
     public List<Film> getListOfPopularFilms(int count) {
         return filmStorage.findAll().stream()
-                .sorted(new FilmComparatorByLikes())
+                .sorted(new FilmComparatorByLikes().reversed())
+                .filter(film -> !film.getLikes().isEmpty())
                 .limit(count)
                 .toList();
     }

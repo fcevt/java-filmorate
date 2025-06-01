@@ -41,4 +41,20 @@ public class UserService {
                 .map(friend1 -> userStorage.findById(friend1))
                 .toList();
     }
+
+    public User getUserById(Long userId) {
+        return userStorage.findById(userId);
+    }
+
+    public User createUser(User user) {
+        return userStorage.create(user);
+    }
+
+    public User updateUser(User user) {
+        return userStorage.update(user);
+    }
+
+    public List<User> getAllUsers() {
+        return userStorage.findAll();
+    }
 }

@@ -16,13 +16,15 @@ public class InMemoryFilmStorage implements FilmStorage {
     private long id = 0;
     private final Map<Long, Film> films = new HashMap<>();
 
-    @Override public List<Film> findAll() {
+    @Override
+    public List<Film> findAll() {
         return new ArrayList<>(films.values());
     }
 
-    @Override public Film findById(long id) {
+    @Override
+    public Film findById(long id) {
         if (!films.containsKey(id)) {
-            throw new NotFoundException("Film not found");
+            throw new NotFoundException("Фильм с id=" + id + " не найден");
         }
         return films.get(id);
     }
