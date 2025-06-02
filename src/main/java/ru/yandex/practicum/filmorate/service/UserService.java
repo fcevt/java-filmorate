@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
@@ -7,6 +8,7 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class UserService {
     private UserStorage userStorage;
@@ -18,6 +20,7 @@ public class UserService {
     public void addToFriends(Long userId, Long friendId) {
         User user = userStorage.findById(userId);
         User friend = userStorage.findById(friendId);
+        log.debug("пользователи с id {} и {} теперь друзья", userId, friendId);
         user.getFriends().add(friendId);
         friend.getFriends().add(userId);
     }
@@ -25,6 +28,7 @@ public class UserService {
     public void removeFromFriends(Long userId, Long friendId) {
         User user = userStorage.findById(userId);
         User friend = userStorage.findById(friendId);
+        log.debug("Пользователи с id {} и {} больше не друзья", userId, friendId);
         user.getFriends().remove(friendId);
         friend.getFriends().remove(userId);
     }
