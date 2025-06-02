@@ -11,7 +11,7 @@ import java.util.List;
 @Slf4j
 @Service
 public class UserService {
-    private UserStorage userStorage;
+    private final UserStorage userStorage;
 
     public UserService(InMemoryUserStorage userStorage) {
         this.userStorage = userStorage;
@@ -35,14 +35,14 @@ public class UserService {
 
     public List<User> getListOfFriends(Long userId) {
         return userStorage.findById(userId).getFriends().stream()
-                .map(friendId -> userStorage.findById(friendId))
+                .map(userStorage::findById)
                 .toList();
     }
 
     public List<User> getListOfMutualFriends(Long userId, Long friendId) {
         return userStorage.findById(userId).getFriends().stream()
                 .filter(friend -> userStorage.findById(friendId).getFriends().contains(friend))
-                .map(friend1 -> userStorage.findById(friend1))
+                .map(userStorage::findById)
                 .toList();
     }
 

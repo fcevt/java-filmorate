@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
@@ -11,7 +10,7 @@ import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 import java.time.LocalDate;
 
 public class FilmControllerTest {
-    FilmStorage filmStorage = new InMemoryFilmStorage();
+    final FilmStorage filmStorage = new InMemoryFilmStorage();
 
     @Test
     public void creatingMovieWithCorrectDateAndNameTest() {
