@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.MinDateAnnotationValidator;
 
 import java.util.*;
 
@@ -32,7 +31,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film create(Film film) {
-        MinDateAnnotationValidator.validateDate(film);
         film.setId(++id);
         film.setLikes(new HashSet<>());
         films.put(film.getId(), film);
@@ -42,17 +40,13 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film update(Film film) {
-        if (films.containsKey(film.getId())) {
-            MinDateAnnotationValidator.validateDate(film);
-            Film oldFilm = films.get(film.getId());
-            oldFilm.setName(film.getName());
-            oldFilm.setDescription(film.getDescription());
-            oldFilm.setDuration(film.getDuration());
-            oldFilm.setReleaseDate(film.getReleaseDate());
-            log.debug("фильм обновлен {}", oldFilm);
-            return oldFilm;
+        if (!films.containsKey(film.getId())) {
+            log.warn("Фильм с id={} не найден", film.getId());
+            throw new NotFoundException("Фильм с id=" + film.getId() + " не найден");
         }
-        log.warn("Фильм с id={} не найден", film.getId());
-        throw new NotFoundException("Фильм с id=" + film.getId() + " не найден");
+        film.setLikes(films.get(film.getId()).getLikes());
+        films.put(film.getId(), film);
+        log.debug("фильм обновлен {}", film);
+        return film;
     }
 }

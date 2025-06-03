@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.storage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.*;
@@ -20,7 +19,6 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     public User create(User user) {
-        validateUser(user);
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
@@ -32,18 +30,13 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     public User update(User user) {
-        if (users.containsKey(user.getId())) {
-            validateUser(user);
-            User oldUser = users.get(user.getId());
-            oldUser.setLogin(user.getLogin());
-            oldUser.setBirthday(user.getBirthday());
-            oldUser.setEmail(user.getEmail());
-            oldUser.setName(user.getName());
-            log.debug("Обновлен пользователь {}", oldUser);
-            return oldUser;
+        if (!users.containsKey(user.getId())) {
+            log.warn("Пользователь с id={} не найден", user.getId());
+            throw new NotFoundException("Пользователь с id=" + user.getId() + " не найден");
         }
-        log.warn("Пользователь с id={} не найден", user.getId());
-        throw new NotFoundException("Пользователь с id=" + user.getId() + " не найден");
+        users.put(user.getId(), user);
+        log.debug("Обновлен пользователь {}", user);
+        return user;
     }
 
     public User findById(long id) {
@@ -52,12 +45,5 @@ public class InMemoryUserStorage implements UserStorage {
             throw new NotFoundException("Пользователь с id=" + id + "не найден");
         }
         return users.get(id);
-    }
-
-    private void validateUser(User user) {
-        if (user.getLogin().contains(" ")) {
-            log.warn("Логин содержит пробелы");
-            throw new ValidationException("Логин не может содержать пробелы");
-        }
     }
 }

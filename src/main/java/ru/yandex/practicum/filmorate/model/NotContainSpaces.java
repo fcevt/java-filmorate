@@ -8,12 +8,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Constraint(validatedBy = MinDateAnnotationValidator.class)
+@Constraint(validatedBy = LoginValidator.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface MinDate {
-    String message() default "Не верная дата релиза";
+public @interface NotContainSpaces {
+    String message() default "";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
-    String value();
 }

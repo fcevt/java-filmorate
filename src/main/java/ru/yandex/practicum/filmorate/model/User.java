@@ -13,6 +13,7 @@ public class User {
     @Email
     private String email;
     @NotBlank(message = "Логин не может быть пустым")
+    @NotContainSpaces(message = "Логин не может содержать пробелы")
     private String login;
     private String name;
     @PastOrPresent
