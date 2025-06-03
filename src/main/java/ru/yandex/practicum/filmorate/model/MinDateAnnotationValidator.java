@@ -18,6 +18,5 @@ public class MinDateAnnotationValidator implements ConstraintValidator<MinDate, 
     @Override
     public boolean isValid(LocalDate contactField, ConstraintValidatorContext context) {
         return !contactField.isBefore(minDate);
-
     }
 }

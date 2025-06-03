@@ -2,14 +2,13 @@ package ru.yandex.practicum.filmorate;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import java.time.LocalDate;
 
-public class FilmControllerTest {
+public class FilmStorageTest {
     final FilmStorage filmStorage = new InMemoryFilmStorage();
 
     @Test
@@ -25,17 +24,6 @@ public class FilmControllerTest {
         Assertions.assertEquals(film.getDuration(), film1.getDuration());
         Assertions.assertEquals(film.getReleaseDate(), film1.getReleaseDate());
     }
-
-    @Test
-    public void creatingMovieWithEarlyDate() {
-        Film film = new Film();
-        film.setName("dfgh");
-        film.setReleaseDate(LocalDate.of(1895, 12, 27));
-        film.setDescription("sdfdsf");
-        film.setDuration(12);
-        Assertions.assertThrows(ValidationException.class, () -> filmStorage.create(film));
-    }
-
 
     @Test
     public void creatingMovieWithDescriptionOf200Characters() {
