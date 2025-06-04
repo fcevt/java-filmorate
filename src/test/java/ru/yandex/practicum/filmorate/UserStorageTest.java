@@ -3,24 +3,15 @@ package ru.yandex.practicum.filmorate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import ru.yandex.practicum.filmorate.controller.UserController;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
 
-class UserControllerTest {
+public class UserStorageTest {
 
-    UserController userController = new UserController();
-
-    @Test
-    public void loginValidationWithSpacesTest() {
-        User user = new User();
-        user.setEmail("wers@mail.ru");
-        user.setBirthday(LocalDate.of(2003, 12, 1));
-        user.setLogin("fgj d");
-        Assertions.assertThrows(ValidationException.class, () -> userController.create(user));
-    }
+    final UserStorage userStorage = new InMemoryUserStorage();
 
     @Test
     public void dateOfBirthValidationTest() {
@@ -28,7 +19,7 @@ class UserControllerTest {
         user.setEmail("wers@mail.ru");
         user.setBirthday(LocalDate.now());
         user.setLogin("fgjd");
-        User user1 = userController.create(user);
+        User user1 = userStorage.create(user);
         Assertions.assertEquals(user.getBirthday(), user1.getBirthday());
         Assertions.assertEquals(user.getEmail(), user1.getEmail());
         Assertions.assertEquals(user.getLogin(),user1.getLogin());

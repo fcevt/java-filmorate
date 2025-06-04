@@ -1,34 +1,22 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.extern.slf4j.Slf4j;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
-import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-@Slf4j
-public class MinDateAnnotationValidator {
+public class MinDateAnnotationValidator implements ConstraintValidator<MinDate, LocalDate> {
+    final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    LocalDate minDate;
 
-    public static void validateDate(Object object) {
-       Class<?> objectClass = object.getClass();
-       DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-       for (Field field : objectClass.getDeclaredFields()) {
-           if (field.isAnnotationPresent(MinDate.class)) {
-               MinDate annotation = field.getAnnotation(MinDate.class);
-               LocalDate expectedMinDate = LocalDate.parse(annotation.value(), dateTimeFormatter);
-               field.setAccessible(true);
-               try {
-                   Object fieldValue = field.get(object);
-                   LocalDate date = (LocalDate) fieldValue;
-                   if (date.isBefore(expectedMinDate)) {
-                       log.warn("Задана дата раньше 28.12.1895");
-                       throw new ValidationException("Дата релиза не может быть раньше 28.12.1895");
-                   }
-               } catch (IllegalAccessException e) {
-                   log.warn(e.getMessage());
-               }
-           }
-       }
+    @Override
+    public void initialize(final MinDate constraintAnnotation) {
+        this.minDate = LocalDate.parse(constraintAnnotation.value(), dateTimeFormatter);
+    }
+
+    @Override
+    public boolean isValid(LocalDate contactField, ConstraintValidatorContext context) {
+        return !contactField.isBefore(minDate);
     }
 }
