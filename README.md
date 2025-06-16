@@ -4,6 +4,6 @@ Template repository for Filmorate project.
 Примеры обращения к БД
 полуяение всех пользователей
 '''
-SELECT *
+SELECT *  
 FROM user;
 '''
