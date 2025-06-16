@@ -12,3 +12,18 @@ FROM user;
 SELECT *
 FROM film;
 ```
+- получение пользователя по id = 5 например 
+```
+SELECT *
+FROM user
+WHERE id = 5;
+```
+- получение списка друзей пользователя с id = 5
+```
+SELECT *
+FROM user
+WHERE user_id IN (SELECT friend_id
+                 FROM friendship
+                 WHERE user_id = 5);
+```
+)
