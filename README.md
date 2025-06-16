@@ -26,4 +26,14 @@ WHERE user_id IN (SELECT friend_id
                  FROM friendship
                  WHERE user_id = 5);
 ```
-)
+- получение списка общих друзей у пользователей с id = 5 и id = 6
+```
+SELECT *
+FROM user
+WHERE user_id IN (SELECT friend_id
+                  FROM friendship
+                  WHERE user_id = 6
+                        AND friend_id IN (SELECT friend_id
+                                          FROM friendship
+                                          WHERE user_id = 5));
+```
