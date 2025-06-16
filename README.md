@@ -37,3 +37,13 @@ WHERE user_id IN (SELECT friend_id
                                           FROM friendship
                                           WHERE user_id = 5));
 ```
+- получение 10 самых популярных фильмов
+```
+SELECT *
+FROM film
+WHERE film_id IN (SELECT film_id
+                  FROM likes
+                  GROUP BY film_id
+                  ORDER BY COUNT(user_id) DESC
+                  LIMIT 10);
+```
