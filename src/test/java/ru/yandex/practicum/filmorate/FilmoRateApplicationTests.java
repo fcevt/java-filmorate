@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.MPA;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.dao.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.dao.UserDbStorage;
@@ -104,5 +106,66 @@ public class FilmoRateApplicationTests {
         Assertions.assertThat(userStorage.findFriends(user2.getId()).isEmpty()).isTrue();
         userStorage.removeFriend(user1.getId(), user3.getId());
         Assertions.assertThat(userStorage.findFriends(user1.getId()).isEmpty()).isTrue();
+    }
+
+    @Test
+    public void createAndFindFilmTest() {
+        Film film = new Film();
+        film.setName("test");
+        film.setDescription("test");
+        film.setDuration(10);
+        film.setReleaseDate(LocalDate.now());
+        film.setMpa(new MPA());
+        Film film1 = filmStorage.create(film);
+        Film film2 = filmStorage.findById(film1.getId());
+        Assertions.assertThat(film1).isEqualTo(film2);
+        film1 = new Film();
+        film1.setName("test2");
+        film1.setDescription("test2");
+        film1.setDuration(101);
+        film1.setReleaseDate(LocalDate.now());
+        film1.setMpa(new MPA());
+        filmStorage.create(film1);
+        List<Film> films = filmStorage.findAll();
+        Assertions.assertThat(films).hasSize(2);
+    }
+
+    @Test
+    public void filmUpdateTest() {
+        Film film = new Film();
+        film.setName("test");
+        film.setDescription("test");
+        film.setDuration(10);
+        film.setReleaseDate(LocalDate.now());
+        film.setMpa(new MPA());
+        Film film1 = filmStorage.create(film);
+        film1.setName("updateName");
+        film1.setDescription("updateDescription");
+        Film film2 = filmStorage.update(film1);
+        Assertions.assertThat(film2).isEqualTo(filmStorage.findById(film1.getId()));
+    }
+
+    @Test
+    public void addAndDeleteLikeFilmTest() {
+        Film film = new Film();
+        film.setName("test");
+        film.setDescription("test");
+        film.setDuration(10);
+        film.setReleaseDate(LocalDate.now());
+        film.setMpa(new MPA());
+        Film film1 = filmStorage.create(film);
+        User user = new User();
+        user.setLogin("test");
+        user.setBirthday(LocalDate.of(1990, 1, 1));
+        user.setEmail("test@test.com");
+        user.setName("test");
+        user.setFriends(new HashSet<>());
+        User user1 = userStorage.create(user);
+        filmStorage.addLike(film1.getId(), user1.getId());
+        Film film2 = filmStorage.findById(film1.getId());
+        Assertions.assertThat(film2.getLikes().size()).isEqualTo(1);
+        filmStorage.deleteLike(film1.getId(), user1.getId());
+        Film film3 = filmStorage.findById(film2.getId());
+        Assertions.assertThat(film3.getLikes().size()).isEqualTo(0);
     }
 }
