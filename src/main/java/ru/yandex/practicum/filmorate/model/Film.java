@@ -32,10 +32,6 @@ public class Film {
     @EqualsAndHashCode.Exclude
     private Set<Genre> genres;
 
-    public  boolean hasName() {
-        return name != null && !name.isEmpty();
-    }
-
     public boolean hasDescription() {
         return description != null && !description.isEmpty();
     }

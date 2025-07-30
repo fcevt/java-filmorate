@@ -10,8 +10,8 @@ import org.springframework.context.annotation.Import;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.MPA;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.dao.FilmDbStorage;
-import ru.yandex.practicum.filmorate.storage.dao.UserDbStorage;
+import ru.yandex.practicum.filmorate.storage.dao.FilmRepository;
+import ru.yandex.practicum.filmorate.storage.dao.UserRepository;
 import ru.yandex.practicum.filmorate.storage.dao.mappers.FilmExtractor;
 import ru.yandex.practicum.filmorate.storage.dao.mappers.FilmRowMapper;
 import ru.yandex.practicum.filmorate.storage.dao.mappers.UserExtractor;
@@ -27,12 +27,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @JdbcTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-@Import({UserDbStorage.class, UserRowMapper.class, UserExtractor.class, FilmDbStorage.class, FilmRowMapper.class,
+@Import({UserRepository.class, UserRowMapper.class, UserExtractor.class, FilmRepository.class, FilmRowMapper.class,
         FilmExtractor.class})
 
 public class FilmoRateApplicationTests {
-    private final UserDbStorage userStorage;
-    private final FilmDbStorage filmStorage;
+    private final UserRepository userStorage;
+    private final FilmRepository filmStorage;
 
     @Test
     public void createAndFindByIdUserTest() {

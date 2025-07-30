@@ -15,7 +15,7 @@ public class UserService {
 
     private final UserStorage userStorage;
 
-    public UserService(@Qualifier("userDbStorage") UserStorage userStorage) {
+    public UserService(@Qualifier("userRepository") UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
@@ -53,12 +53,8 @@ public class UserService {
         if (user.hasName()) {
             userFromDb.setName(user.getName());
         }
-        if (user.hasEmail()) {
-            userFromDb.setEmail(user.getEmail());
-        }
-        if (user.hasLogin()) {
-            userFromDb.setLogin(user.getLogin());
-        }
+        userFromDb.setEmail(user.getEmail());
+        userFromDb.setLogin(user.getLogin());
         return userStorage.update(userFromDb);
     }
 

@@ -17,8 +17,8 @@ public class FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
 
-    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage,
-                       @Qualifier("userDbStorage") UserStorage userStorage) {
+    public FilmService(@Qualifier("filmRepository") FilmStorage filmStorage,
+                       @Qualifier("userRepository") UserStorage userStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
     }
@@ -37,9 +37,7 @@ public class FilmService {
 
     public Film updateFilm(Film film) {
         Film filmToUpdate = filmStorage.findById(film.getId());
-        if (film.hasName()) {
-            filmToUpdate.setName(film.getName());
-        }
+        filmToUpdate.setName(film.getName());
         if (film.hasDescription()) {
             filmToUpdate.setDescription(film.getDescription());
         }

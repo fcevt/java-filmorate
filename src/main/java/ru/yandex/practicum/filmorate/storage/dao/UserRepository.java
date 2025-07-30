@@ -14,7 +14,7 @@ import java.util.NoSuchElementException;
 
 @Repository()
 @Qualifier("userDbStorage")
-public class UserDbStorage extends BaseRepository<User> implements UserStorage {
+public class UserRepository extends BaseRepository<User> implements UserStorage {
     private static final String FIND_ALL_QUERY = "SELECT u.user_id, " +
             "u.username, " +
             "u.login," +
@@ -69,7 +69,7 @@ public class UserDbStorage extends BaseRepository<User> implements UserStorage {
             "ORDER BY u.user_id";
     protected final UserExtractor userExtractor;
 
-    public UserDbStorage(JdbcTemplate jdbc, RowMapper<User> mapper, UserExtractor userExtractor) {
+    public UserRepository(JdbcTemplate jdbc, RowMapper<User> mapper, UserExtractor userExtractor) {
         super(jdbc, mapper);
         this.userExtractor = userExtractor;
     }

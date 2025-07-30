@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.storage.dao;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -13,9 +13,9 @@ import ru.yandex.practicum.filmorate.storage.dao.mappers.FilmExtractor;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-@Component
+@Repository
 @Qualifier("filmDbStorage")
-public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
+public class FilmRepository extends BaseRepository<Film> implements FilmStorage {
     private static final String FIND_ALL_QUERY = "SELECT f.film_id, " +
             "f.film_name, " +
             "f.description, " +
@@ -74,7 +74,7 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
 
     protected final FilmExtractor filmExtractor;
 
-    public FilmDbStorage(JdbcTemplate jdbc, RowMapper<Film> mapper, FilmExtractor filmExtractor) {
+    public FilmRepository(JdbcTemplate jdbc, RowMapper<Film> mapper, FilmExtractor filmExtractor) {
         super(jdbc, mapper);
         this.filmExtractor = filmExtractor;
     }

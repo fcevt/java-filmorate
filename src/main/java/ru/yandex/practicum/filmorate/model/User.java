@@ -31,12 +31,4 @@ public class User {
     public boolean hasBirthday() {
         return birthday != null;
     }
-
-    public boolean hasLogin() {
-        return login != null && !login.isEmpty();
-    }
-
-    public boolean hasEmail() {
-        return email != null && !email.isEmpty();
-    }
 }
