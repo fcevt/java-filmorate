@@ -29,19 +29,19 @@ CREATE TABLE IF NOT EXISTS genre (
 
 CREATE TABLE IF NOT EXISTS film_genre (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    film_id BIGINT REFERENCES films(film_id),
+    film_id BIGINT REFERENCES films(film_id) ON DELETE CASCADE,
     genre_id BIGINT REFERENCES genre(genre_id)
 );
 
 CREATE TABLE IF NOT EXISTS likes (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    user_id BIGINT REFERENCES users(user_id),
-    film_id BIGINT REFERENCES films(film_id)
+    user_id BIGINT REFERENCES users(user_id) ON DELETE CASCADE,
+    film_id BIGINT REFERENCES films(film_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS friendship (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    user_id BIGINT REFERENCES users(user_id),
-    friend_id BIGINT REFERENCES users(user_id),
+    user_id BIGINT REFERENCES users(user_id) ON DELETE CASCADE,
+    friend_id BIGINT REFERENCES users(user_id) ON DELETE CASCADE,
     status BOOLEAN
 );

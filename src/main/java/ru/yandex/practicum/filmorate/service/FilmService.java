@@ -77,4 +77,8 @@ public class FilmService {
                 .limit(count)
                 .toList();
     }
+
+    public void deleteFilm(int filmId) {
+        filmStorage.deleteFilmById(filmId);
+    }
 }
