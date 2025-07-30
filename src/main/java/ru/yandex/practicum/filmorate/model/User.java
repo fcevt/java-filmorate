@@ -2,6 +2,8 @@ package ru.yandex.practicum.filmorate.model;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import ru.yandex.practicum.filmorate.model.annotation.NotContainSpaces;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -19,5 +21,14 @@ public class User {
     private String name;
     @PastOrPresent
     private LocalDate birthday;
+    @EqualsAndHashCode.Exclude
     private Set<Long> friends = new HashSet<>();
+
+    public boolean hasName() {
+        return name != null && !name.isEmpty();
+    }
+
+    public boolean hasBirthday() {
+        return birthday != null;
+    }
 }

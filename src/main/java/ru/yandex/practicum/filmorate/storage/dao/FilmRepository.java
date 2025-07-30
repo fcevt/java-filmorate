@@ -1,0 +1,135 @@
+package ru.yandex.practicum.filmorate.storage.dao;
+
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.dao.mappers.FilmExtractor;
+
+import java.util.List;
+import java.util.NoSuchElementException;
+
+@Repository
+@Qualifier("filmDbStorage")
+public class FilmRepository extends BaseRepository<Film> implements FilmStorage {
+    private static final String FIND_ALL_QUERY = "SELECT f.film_id, " +
+            "f.film_name, " +
+            "f.description, " +
+            "f.duration, " +
+            "f.release_date, " +
+            "r.rating_id, " +
+            "r.code, " +
+            "r.description AS mpa_description, " +
+            "g.genre_name,  " +
+            "l.user_id AS likes, " +
+            "fg.genre_id " +
+            "FROM films AS f " +
+            "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
+            "LEFT JOIN likes AS l ON l.film_id = f.film_id " +
+            "LEFT JOIN film_genre AS fg ON fg.film_id = f.film_id " +
+            "LEFT JOIN genre AS g ON g.genre_id = fg.genre_id" +
+            " ORDER BY f.film_id";
+    private static final String FIND_BY_ID_QUERY = "SELECT f.film_id, " +
+            "f.film_name, " +
+            "f.description, " +
+            "f.duration, " +
+            "f.release_date, " +
+            "r.rating_id, " +
+            "r.code, " +
+            "r.description AS mpa_description, " +
+            "g.genre_name,  " +
+            "l.user_id AS likes, " +
+            "fg.genre_id " +
+            "FROM films AS f " +
+            "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
+            "LEFT JOIN likes AS l ON l.film_id = f.film_id " +
+            "LEFT JOIN film_genre AS fg ON fg.film_id = f.film_id " +
+            "LEFT JOIN genre AS g ON g.genre_id = fg.genre_id" +
+            " WHERE f.film_id = ?";
+    private static final String INSERT_QUERY = "INSERT INTO films (film_name, description, release_date, duration," +
+            "rating_id) VALUES (?, ?, ?, ?, ?)";
+    private static final String UPDATE_QUERY = "UPDATE films SET film_name = ?, description = ?, release_date = ?," +
+            "duration = ?, rating_id = ? WHERE film_id = ?";
+    private static final String INSERT_FILM_GENRE_QUERY = "INSERT INTO film_genre (film_id, genre_id) VALUES (?, ?)";
+    private static final String UPDATE_FILM_GENRE_QUERY = "MERGE INTO film_genre USING " +
+            "(VALUES (?, ?)) AS src (film_id, genre_id) " +
+            "ON film_genre.film_id = src.film_id AND film_genre.genre_id = src.genre_id " +
+            "WHEN MATCHED THEN " +
+            "UPDATE SET film_genre.genre_id = src.genre_id " +
+            "WHEN NOT MATCHED THEN " +
+            "INSERT (film_id, genre_id) VALUES (src.film_id, src.genre_id)";
+    private static final String DELETE_FILM_GENRE_QUERY = "DELETE FROM film_genre WHERE film_id = ?";
+    private static final String INSERT_LIKE_QUERY = "MERGE INTO likes USING " +
+            "(VALUES (?, ?)) AS src (film_id, user_id) " +
+            "ON likes.film_id = src.film_id AND likes.user_id = src.user_id " +
+            "WHEN MATCHED THEN " +
+            "UPDATE SET likes.user_id = src.user_id " +
+            "WHEN NOT MATCHED THEN " +
+            "INSERT (film_id, user_id) VALUES (src.film_id, src.user_id)";
+    private static final String DELETE_LIKE_QUERY = "DELETE FROM likes WHERE film_id = ? and user_id = ?";
+
+    protected final FilmExtractor filmExtractor;
+
+    public FilmRepository(JdbcTemplate jdbc, RowMapper<Film> mapper, FilmExtractor filmExtractor) {
+        super(jdbc, mapper);
+        this.filmExtractor = filmExtractor;
+    }
+
+    public List<Film> findAll() {
+        return jdbc.query(FIND_ALL_QUERY, filmExtractor);
+    }
+
+    public Film findById(long id) {
+        try {
+            return jdbc.query(FIND_BY_ID_QUERY, filmExtractor, id).getFirst();
+        } catch (NoSuchElementException e) {
+            throw new NotFoundException("фильм с id : " + id + "не найден");
+        }
+    }
+
+    public Film create(Film film) {
+        long id = insert(INSERT_QUERY,
+                film.getName(),
+                film.getDescription(),
+                film.getReleaseDate(),
+                film.getDuration(),
+                film.getMpa().getId());
+        film.setId(id);
+        if (film.hasGenres()) {
+            for (Genre genre : film.getGenres()) {
+                insert(INSERT_FILM_GENRE_QUERY, film.getId(), genre.getId());
+            }
+        }
+        return film;
+    }
+
+    public Film update(Film film) {
+        findById(film.getId());
+        update(UPDATE_QUERY,
+                film.getName(),
+                film.getDescription(),
+                film.getReleaseDate(),
+                film.getDuration(),
+                film.getMpa().getId(),
+                film.getId());
+        if (film.hasGenres()) {
+            delete(DELETE_FILM_GENRE_QUERY, film.getId());
+            for (Genre genre : film.getGenres()) {
+                update(UPDATE_FILM_GENRE_QUERY, film.getId(), genre.getId());
+            }
+        }
+        return film;
+    }
+
+    public void addLike(long filmId, long userId) {
+        update(INSERT_LIKE_QUERY, filmId, userId);
+    }
+
+    public void deleteLike(long filmId, long userId) {
+        jdbc.update(DELETE_LIKE_QUERY, filmId, userId);
+    }
+}
