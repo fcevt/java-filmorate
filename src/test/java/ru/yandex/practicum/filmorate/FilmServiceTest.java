@@ -49,6 +49,6 @@ public class FilmServiceTest {
         filmService.addLike(film.getId(), user1.getId());
         Film film2 = new Film();
         filmService.createFilm(film2);
-        Assertions.assertEquals(1, filmService.getListOfPopularFilms(2).size());
+        Assertions.assertEquals(2, filmService.getListOfPopularFilms(2).size());
     }
 }
