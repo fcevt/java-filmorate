@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -58,5 +59,14 @@ public class InMemoryFilmStorage implements FilmStorage {
         films.put(film.getId(), film);
         log.debug("фильм обновлен {}", film);
         return film;
+    }
+
+    @Override
+    public List<Film> findCommonFilms(long userId, long friendId) {
+        return films.values().stream()
+                .filter(film -> film.getLikes().contains(userId))
+                .filter(film -> film.getLikes().contains(friendId))
+                .sorted(Comparator.comparingInt((Film film) -> film.getLikes().size()).reversed())
+                .collect(Collectors.toList());
     }
 }
