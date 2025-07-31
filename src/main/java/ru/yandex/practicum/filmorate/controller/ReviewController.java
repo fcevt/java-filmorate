@@ -28,7 +28,7 @@ public class ReviewController {
 
     @GetMapping("/{id}")
     public ReviewDTO getOneReview(@PathVariable @Positive Long id) {
-        return null;
+        return reviewService.getOneReview(id);
     }
 
     @PostMapping

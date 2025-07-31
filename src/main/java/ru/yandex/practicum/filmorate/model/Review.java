@@ -11,5 +11,5 @@ public class Review {
     private Long film;
     private String content;
     private boolean isPositive;
-    private int raiting;
+    private short useful;
 }
