@@ -3,12 +3,16 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.FilmComparatorByLikes;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -70,10 +74,22 @@ public class FilmService {
         filmStorage.deleteLike(filmId, userId);
     }
 
-    public List<Film> getListOfPopularFilms(int count) {
-        return filmStorage.findAll().stream()
+    public List<Film> getListOfPopularFilms(int count, Integer genreId, Integer year) {
+        if (genreId == null) {
+            throw new NotFoundException("Жанр не может быть пустым");
+        }
+
+        List<Film> films = filmStorage.findAll();
+        int filterYear = (year != null) ? year : LocalDate.now().getYear();
+
+        List<Film> filterFilms = films.stream()
+                .filter(film -> film.hasGenres() &&
+                        film.getGenres().stream().anyMatch(genre -> genre.getId().equals(genreId)))
+                .filter(film -> film.getReleaseDate().getYear() == filterYear)
+                .collect(Collectors.toList()); //фильтр по жанру и году
+
+        return filterFilms.stream()
                 .sorted(new FilmComparatorByLikes().reversed())
-                .filter(Film::hasLikes)
                 .limit(count)
                 .toList();
     }

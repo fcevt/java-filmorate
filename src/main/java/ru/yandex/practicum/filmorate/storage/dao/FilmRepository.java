@@ -72,6 +72,20 @@ public class FilmRepository extends BaseRepository<Film> implements FilmStorage 
             "INSERT (film_id, user_id) VALUES (src.film_id, src.user_id)";
     private static final String DELETE_LIKE_QUERY = "DELETE FROM likes WHERE film_id = ? and user_id = ?";
 
+    private static final String FIND_POPULAR_BY_GENRE_AND_YEAR_QUERY =
+            "SELECT f.film_id, f.film_name, f.description, f.duration, f.release_date, " +
+                    "r.rating_id, r.code, r.description AS mpa_description, " +
+                    "g.genre_name, l.user_id AS likes, fg.genre_id " +
+                    "FROM films AS f " +
+                    "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
+                    "LEFT JOIN likes AS l ON l.film_id = f.film_id " +
+                    "LEFT JOIN film_genre AS fg ON fg.film_id = f.film_id " +
+                    "LEFT JOIN genre AS g ON g.genre_id = fg.genre_id " +
+                    "WHERE fg.genre_id = ? {AND EXTRACT(YEAR FROM f.release_date) = ?} " +
+                    "GROUP BY f.film_id, l.user_id, fg.genre_id, g.genre_name, r.rating_id " +
+                    "ORDER BY COUNT(l.user_id) DESC " +
+                    "LIMIT ?";
+
     protected final FilmExtractor filmExtractor;
 
     public FilmRepository(JdbcTemplate jdbc, RowMapper<Film> mapper, FilmExtractor filmExtractor) {
@@ -131,5 +145,16 @@ public class FilmRepository extends BaseRepository<Film> implements FilmStorage 
 
     public void deleteLike(long filmId, long userId) {
         jdbc.update(DELETE_LIKE_QUERY, filmId, userId);
+    }
+
+    public List<Film> getListOfPopularFilms(int count, int genreId, Integer year) {
+        String query = FIND_POPULAR_BY_GENRE_AND_YEAR_QUERY;
+
+        if (year == null) {
+            query = query.replace("AND EXTRACT(YEAR FROM f.release_date) = ?", "");
+            return jdbc.query(query, filmExtractor, genreId, count);
+        } else {
+            return jdbc.query(query, filmExtractor, genreId, year, count);
+        }
     }
 }
