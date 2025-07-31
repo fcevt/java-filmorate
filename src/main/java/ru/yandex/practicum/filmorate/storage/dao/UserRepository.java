@@ -5,10 +5,14 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.dao.mappers.EventRowMapper;
 import ru.yandex.practicum.filmorate.storage.dao.mappers.UserExtractor;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -67,11 +71,15 @@ public class UserRepository extends BaseRepository<User> implements UserStorage 
             "WHERE u.user_id IN (SELECT friend_id FROM friendship WHERE user_id = ? AND friend_id IN (" +
             "SELECT friend_id FROM friendship WHERE user_id = ?)) " +
             "ORDER BY u.user_id";
+    private static final String GET_FEED_QUERY = "SELECT * FROM feed WHERE user_id = ?";
     protected final UserExtractor userExtractor;
+    protected  final EventRowMapper eventRowMapper;
 
-    public UserRepository(JdbcTemplate jdbc, RowMapper<User> mapper, UserExtractor userExtractor) {
+    public UserRepository(JdbcTemplate jdbc, RowMapper<User> mapper, UserExtractor userExtractor,
+                          EventRowMapper eventRowMapper) {
         super(jdbc, mapper);
         this.userExtractor = userExtractor;
+        this.eventRowMapper = eventRowMapper;
     }
 
     public List<User> findAll() {
@@ -111,12 +119,26 @@ public class UserRepository extends BaseRepository<User> implements UserStorage 
         findById(userId);
         findById(friendId); //проверка что оба юзера существуют
         update(ADD_FRIEND_QUERY, userId, friendId);
+        insert(INSERT_EVENT_QUERY,
+                Timestamp.from(Instant.now()),
+                userId,
+                "FRIEND",
+                "ADD",
+                friendId
+        );
     }
 
     public void removeFriend(long userId, long friendId) {
         findById(userId);
         findById(friendId);
         jdbc.update(DELETE_FRIEND_QUERY, userId, friendId);
+        insert(INSERT_EVENT_QUERY,
+                Timestamp.from(Instant.now()),
+                userId,
+                "FRIEND",
+                "REMOVE",
+                friendId
+        );
     }
 
     public List<User> findFriends(long userId) {
@@ -128,5 +150,10 @@ public class UserRepository extends BaseRepository<User> implements UserStorage 
         findById(userId);
         findById(friendId);
         return jdbc.query(GET_COMMON_FRIENDS, userExtractor, userId, friendId);
+    }
+
+    public List<Event> getFeed(long userId) {
+        findById(userId);
+        return jdbc.query(GET_FEED_QUERY, eventRowMapper, userId);
     }
 }

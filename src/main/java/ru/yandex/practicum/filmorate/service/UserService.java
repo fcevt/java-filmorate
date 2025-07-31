@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -60,5 +61,9 @@ public class UserService {
 
     public List<User> getAllUsers() {
         return userStorage.findAll();
+    }
+
+    public List<Event> getEventsByUserId(Long userId) {
+       return userStorage.getFeed(userId);
     }
 }

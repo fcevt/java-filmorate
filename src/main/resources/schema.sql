@@ -45,3 +45,12 @@ CREATE TABLE IF NOT EXISTS friendship (
     friend_id BIGINT REFERENCES users(user_id),
     status BOOLEAN
 );
+
+CREATE TABLE IF NOT EXISTS feed (
+    event_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    timestamp TIMESTAMP,
+    user_id BIGINT,
+    event_type VARCHAR,
+    operation VARCHAR,
+    entity_id BIGINT
+);

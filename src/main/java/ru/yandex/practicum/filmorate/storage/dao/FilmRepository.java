@@ -10,6 +10,8 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.dao.mappers.FilmExtractor;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -127,9 +129,23 @@ public class FilmRepository extends BaseRepository<Film> implements FilmStorage 
 
     public void addLike(long filmId, long userId) {
         update(INSERT_LIKE_QUERY, filmId, userId);
+        insert(INSERT_EVENT_QUERY,
+                Timestamp.from(Instant.now()),
+                userId,
+                "LIKE",
+                "ADD",
+                filmId
+        );
     }
 
     public void deleteLike(long filmId, long userId) {
         jdbc.update(DELETE_LIKE_QUERY, filmId, userId);
+        insert(INSERT_EVENT_QUERY,
+                Timestamp.from(Instant.now()),
+                userId,
+                "LIKE",
+                "REMOVE",
+                filmId
+        );
     }
 }
