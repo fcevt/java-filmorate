@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.FilmComparatorByLikes;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -78,15 +79,10 @@ public class FilmService {
                 .filter(film -> genreId == null ||
                         (film.hasGenres() && film.getGenres().stream()
                                 .anyMatch(genre -> genre.getId().equals(genreId))))
-                .collect(Collectors.toList());
-
-        filterFilms.sort((f1, f2) -> {
-            int likes1 = f1.hasLikes() ? f1.getLikes().size() : 0;
-            int likes2 = f2.hasLikes() ? f2.getLikes().size() : 0;
-            return Integer.compare(likes2, likes1);
-        });
+                .toList();
 
         return filterFilms.stream()
+                .sorted(new FilmComparatorByLikes().reversed())
                 .limit(count)
                 .collect(Collectors.toList());
     }
