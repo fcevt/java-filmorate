@@ -4,11 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.FilmComparatorByLikes;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -70,11 +70,24 @@ public class FilmService {
         filmStorage.deleteLike(filmId, userId);
     }
 
-    public List<Film> getListOfPopularFilms(int count) {
-        return filmStorage.findAll().stream()
-                .sorted(new FilmComparatorByLikes().reversed())
-                .filter(Film::hasLikes)
+    public List<Film> getListOfPopularFilms(int count, Integer genreId, Integer year) {
+        List<Film> films = filmStorage.findAll();
+
+        List<Film> filterFilms = films.stream()
+                .filter(film -> year == null || film.getReleaseDate().getYear() == year)
+                .filter(film -> genreId == null ||
+                        (film.hasGenres() && film.getGenres().stream()
+                                .anyMatch(genre -> genre.getId().equals(genreId))))
+                .collect(Collectors.toList());
+
+        filterFilms.sort((f1, f2) -> {
+            int likes1 = f1.hasLikes() ? f1.getLikes().size() : 0;
+            int likes2 = f2.hasLikes() ? f2.getLikes().size() : 0;
+            return Integer.compare(likes2, likes1);
+        });
+
+        return filterFilms.stream()
                 .limit(count)
-                .toList();
+                .collect(Collectors.toList());
     }
 }

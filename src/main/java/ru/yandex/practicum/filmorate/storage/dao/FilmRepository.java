@@ -72,6 +72,13 @@ public class FilmRepository extends BaseRepository<Film> implements FilmStorage 
             "INSERT (film_id, user_id) VALUES (src.film_id, src.user_id)";
     private static final String DELETE_LIKE_QUERY = "DELETE FROM likes WHERE film_id = ? and user_id = ?";
 
+    private static final String FIND_POPULAR_QUERY =
+            "SELECT f.* FROM films f " +
+                    "WHERE (:genreId IS NULL OR EXISTS (SELECT 1 FROM film_genre fg WHERE fg.film_id = f.id AND fg.genre_id = :genreId)) " +
+                    "AND EXTRACT(YEAR FROM f.release_date) = :year " +
+                    "ORDER BY (SELECT COUNT(*) FROM likes l WHERE l.film_id = f.id) DESC " +
+                    "LIMIT :count";
+
     protected final FilmExtractor filmExtractor;
 
     public FilmRepository(JdbcTemplate jdbc, RowMapper<Film> mapper, FilmExtractor filmExtractor) {
