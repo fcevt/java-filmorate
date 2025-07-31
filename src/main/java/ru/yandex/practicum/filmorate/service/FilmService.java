@@ -73,7 +73,6 @@ public class FilmService {
     public List<Film> getListOfPopularFilms(int count) {
         return filmStorage.findAll().stream()
                 .sorted(new FilmComparatorByLikes().reversed())
-                .filter(Film::hasLikes)
                 .limit(count)
                 .toList();
     }
