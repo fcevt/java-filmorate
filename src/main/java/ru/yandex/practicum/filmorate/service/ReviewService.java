@@ -31,8 +31,6 @@ public class ReviewService {
     }
 
     public List<ReviewDTO> getReviews(Long filmId, Integer count) {
-        List<Review> list = reviewStorage.getMany(filmId);
-
         return reviewStorage.getMany(filmId).stream()
                .map(review ->  ReviewMapper.mapToReviewDTO(review))
                .limit( count == null ? DEFAULT_COUNT : count )
@@ -40,14 +38,9 @@ public class ReviewService {
     }
 
     public ReviewDTO create(ReviewCreate newReview) {
-        User userId = userService.getUserById(newReview.getUserId());
-        if (userId == null)
-            throw new NotFoundException("Отсутствует фильм с id %d".formatted(newReview.getFilmId()));
-
-        Film filmId = filmService.getFilmById(newReview.getFilmId());
-        if (filmId == null)
-            throw new NotFoundException("Отсутствует пользователь с id %d".formatted(newReview.getUserId()));
-
+        // проверки
+        userService.getUserById(newReview.getUserId());
+        filmService.getFilmById(newReview.getFilmId());
         return ReviewMapper.mapToReviewDTO(reviewStorage.create(ReviewMapper.mapToReview(newReview)));
     }
 
@@ -58,8 +51,8 @@ public class ReviewService {
 
     private void checkAndSetLikeValue(Long id, Long userId, short value) {
         reviewStorage.get(id).orElseThrow(() -> new NotFoundException("Отзыв не найден"));
-        if (userService.getUserById(userId) == null)
-            throw new NotFoundException("Пользователь не найден");
+        // проверка
+        userService.getUserById(userId);
         reviewStorage.setLikeValue(id, userId, value);
     }
 
@@ -87,11 +80,9 @@ public class ReviewService {
       Review reviewOld = reviewStorage
               .get(reviewUpdate.getReviewId()).orElseThrow(() -> new NotFoundException("Отзыв не найден"));
       Review review = ReviewMapper.updateRevievFields(reviewOld, reviewUpdate);
-      if (filmService.getFilmById(review.getFilm()) == null)
-          throw new NotFoundException("Фильм не найден");
-      if (userService.getUserById(review.getUser()) == null)
-          throw new NotFoundException("Пользователь не найден");
-
+      // проверки
+      filmService.getFilmById(review.getFilm());
+      userService.getUserById(review.getUser());
       return ReviewMapper.mapToReviewDTO(reviewStorage.update(review));
     }
 
