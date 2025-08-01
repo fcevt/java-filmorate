@@ -1,16 +1,18 @@
 package ru.yandex.practicum.filmorate.dto.review;
 
-import jakarta.validation.constraints.Min;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import jakarta.validation.constraints.NotBlank;
+import lombok.NonNull;
 
 @Data
 public class ReviewCreate {
   @NotBlank
   private String content;
-  private boolean isPositive;
-  @Min(value = 1)
-  private long userId;
-  @Min(value = 1)
-  private long filmId;
+  @JsonProperty("isPositive")
+  private Boolean isPositive;
+  @NonNull
+  private Long userId;
+  @NonNull
+  private Long filmId;
 }

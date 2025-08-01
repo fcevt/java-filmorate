@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
+import jakarta.xml.bind.annotation.XmlType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -22,8 +23,8 @@ public class ReviewController {
     @GetMapping
     public List<ReviewDTO> getReviews(
             @RequestParam(required = false) @Positive Long filmId,
-            @RequestParam(required = false) @Positive Long count) {
-        return null;
+            @RequestParam(required = false) @Positive Integer count) {
+        return reviewService.getReviews(filmId, count);
     }
 
     @GetMapping("/{id}")
@@ -37,41 +38,41 @@ public class ReviewController {
     }
 
     @PutMapping
-    public ReviewDTO update(@RequestBody ReviewUpdate review) {
-        return null;
+    public ReviewDTO update(@RequestBody @Valid ReviewUpdate review) {
+        return reviewService.update(review);
     }
 
     @PutMapping("/{id}/like/{userId}")
     public void setLikeReview(
             @PathVariable @Positive Long id,
             @PathVariable @Positive Long userId) {
-
+        reviewService.setLikeReview(id, userId);
     }
 
     @PutMapping("/{id}/dislike/{userId}")
     public void setDisLikeReview(
             @PathVariable @Positive Long id,
             @PathVariable @Positive Long userId) {
-
+        reviewService.setDisLikeReview(id, userId);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     public void delete(@PathVariable @Positive Long id) {
-
+        reviewService.delete(id);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public void unSetLikeReview(
             @PathVariable @Positive Long id,
             @PathVariable @Positive Long userId) {
-
+        reviewService.deleteLike(id, userId);
     }
 
     @DeleteMapping("/{id}/dislike/{userId}")
     public void unSetDisLikeReview(
             @PathVariable @Positive Long id,
             @PathVariable @Positive Long userId) {
-
+        reviewService.deleteDisLike(id, userId);
     }
 
 }
