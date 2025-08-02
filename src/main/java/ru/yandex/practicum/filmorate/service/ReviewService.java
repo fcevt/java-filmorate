@@ -65,6 +65,7 @@ public class ReviewService {
     }
 
     private void deleteLikeValue(Long id, Long userId, short value) {
+        //TODO : реализовать проверку наличия после реализации второй фичи
         reviewStorage.deleteLikeValue(id, userId, value);
     }
 
