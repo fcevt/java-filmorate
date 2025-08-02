@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -70,11 +71,20 @@ public class FilmService {
         filmStorage.deleteLike(filmId, userId);
     }
 
-    public List<Film> getListOfPopularFilms(int count) {
-        return filmStorage.findAll().stream()
+    public List<Film> getListOfPopularFilms(int count, Integer genreId, Integer year) {
+        List<Film> films = filmStorage.findAll();
+
+        List<Film> filterFilms = films.stream()
+                .filter(film -> year == null || film.getReleaseDate().getYear() == year)
+                .filter(film -> genreId == null ||
+                        (film.hasGenres() && film.getGenres().stream()
+                                .anyMatch(genre -> genre.getId().equals(genreId))))
+                .toList();
+
+        return filterFilms.stream()
                 .sorted(new FilmComparatorByLikes().reversed())
                 .limit(count)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     public void deleteFilm(int filmId) {

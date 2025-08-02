@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
-import java.util.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/films")
@@ -45,8 +45,18 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<Film> getFilmsPopular(@RequestParam(defaultValue = "10", required = false) int count) {
-        return filmService.getListOfPopularFilms(count);
+    public List<Film> getFilmsPopular(@RequestParam(required = false) Integer count,
+                                      @RequestParam(required = false) Integer genreId,
+                                      @RequestParam(required = false) Integer year) {
+
+        int resultCount;
+        if (count != null && count > 0) {
+            resultCount = count;
+        } else {
+            resultCount = Integer.MAX_VALUE;
+        }
+
+        return filmService.getListOfPopularFilms(resultCount, genreId, year);
     }
 
     @DeleteMapping("/{id}")
