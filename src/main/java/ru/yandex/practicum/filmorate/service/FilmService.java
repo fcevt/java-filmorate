@@ -7,7 +7,9 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.FilmComparatorByLikes;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.dao.DirectorRepository;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,11 +19,14 @@ public class FilmService {
 
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
+    private final DirectorRepository directorRepository;
 
     public FilmService(@Qualifier("filmRepository") FilmStorage filmStorage,
-                       @Qualifier("userRepository") UserStorage userStorage) {
+                       @Qualifier("userRepository") UserStorage userStorage,
+                       DirectorRepository directorRepository) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
+        this.directorRepository = directorRepository;
     }
 
     public List<Film> getFilms() {
@@ -53,6 +58,9 @@ public class FilmService {
         }
         if (film.hasGenres()) {
             filmToUpdate.setGenres(film.getGenres());
+        }
+        if (film.hasDirectors()) {
+            filmToUpdate.setDirectors(film.getDirectors());
         }
         return filmStorage.update(filmToUpdate);
     }
@@ -98,5 +106,23 @@ public class FilmService {
         return filmStorage.findCommonFilms(userId, friendId).stream()
                 .sorted(new FilmComparatorByLikes().reversed())
                 .toList();
+    }
+
+    public List<Film> getFilmsByDirector(int directorId, String sortBy) {
+        directorRepository.findById(directorId);
+        List<Film> films = filmStorage.findAll().stream()
+                .filter(f -> f.hasDirectors() && f.getDirectors().stream()
+                        .anyMatch(d -> d.getId() == directorId))
+                .toList();
+
+        if ("year".equals(sortBy)) {
+            return films.stream()
+                    .sorted(Comparator.comparing(Film::getReleaseDate))
+                    .toList();
+        } else {
+            return films.stream()
+                    .sorted(new FilmComparatorByLikes().reversed())
+                    .toList();
+        }
     }
 }
