@@ -71,6 +71,7 @@ public class FilmRepository extends BaseRepository<Film> implements FilmStorage 
             "WHEN NOT MATCHED THEN " +
             "INSERT (film_id, user_id) VALUES (src.film_id, src.user_id)";
     private static final String DELETE_LIKE_QUERY = "DELETE FROM likes WHERE film_id = ? and user_id = ?";
+    private static final String DELETE_FILM_BY_ID_QUERY = "DELETE FROM films WHERE film_id = ?";
 
     protected final FilmExtractor filmExtractor;
 
@@ -131,5 +132,11 @@ public class FilmRepository extends BaseRepository<Film> implements FilmStorage 
 
     public void deleteLike(long filmId, long userId) {
         jdbc.update(DELETE_LIKE_QUERY, filmId, userId);
+    }
+
+    public void deleteFilmById(long filmId) {
+        if (!delete(DELETE_FILM_BY_ID_QUERY, filmId)) {
+            throw new  NotFoundException("Удаляемый Фильм не найден");
+        }
     }
 }

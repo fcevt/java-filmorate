@@ -67,6 +67,7 @@ public class UserRepository extends BaseRepository<User> implements UserStorage 
             "WHERE u.user_id IN (SELECT friend_id FROM friendship WHERE user_id = ? AND friend_id IN (" +
             "SELECT friend_id FROM friendship WHERE user_id = ?)) " +
             "ORDER BY u.user_id";
+    private static final String DELETE_USER_BY_ID_QUERY = "DELETE FROM users WHERE user_id = ?";
     protected final UserExtractor userExtractor;
 
     public UserRepository(JdbcTemplate jdbc, RowMapper<User> mapper, UserExtractor userExtractor) {
@@ -128,5 +129,11 @@ public class UserRepository extends BaseRepository<User> implements UserStorage 
         findById(userId);
         findById(friendId);
         return jdbc.query(GET_COMMON_FRIENDS, userExtractor, userId, friendId);
+    }
+
+    public void deleteUserById(long id) {
+        if (!delete(DELETE_USER_BY_ID_QUERY, id)) {
+            throw new NotFoundException("Удаляемый пользователь не найден");
+        }
     }
 }

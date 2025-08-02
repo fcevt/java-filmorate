@@ -61,4 +61,8 @@ public class UserService {
     public List<User> getAllUsers() {
         return userStorage.findAll();
     }
+
+    public void deleteUserById(int id) {
+        userStorage.deleteUserById(id);
+    }
 }

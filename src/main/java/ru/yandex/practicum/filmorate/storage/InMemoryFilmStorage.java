@@ -59,4 +59,11 @@ public class InMemoryFilmStorage implements FilmStorage {
         log.debug("фильм обновлен {}", film);
         return film;
     }
+
+    @Override
+    public void deleteFilmById(long id) {
+        if (!films.containsKey(id)) {
+            films.remove(id);
+        }
+    }
 }
