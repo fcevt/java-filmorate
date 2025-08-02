@@ -132,6 +132,8 @@ public class UserRepository extends BaseRepository<User> implements UserStorage 
     }
 
     public void deleteUserById(long id) {
-        delete(DELETE_USER_BY_ID_QUERY, id);
+        if (!delete(DELETE_USER_BY_ID_QUERY, id)) {
+            throw new NotFoundException("Удаляемый пользователь не найден");
+        }
     }
 }

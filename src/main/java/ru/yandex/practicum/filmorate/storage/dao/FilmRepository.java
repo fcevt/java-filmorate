@@ -135,6 +135,8 @@ public class FilmRepository extends BaseRepository<Film> implements FilmStorage 
     }
 
     public void deleteFilmById(long filmId) {
-        delete(DELETE_FILM_BY_ID_QUERY, filmId);
+        if (!delete(DELETE_FILM_BY_ID_QUERY, filmId)) {
+            throw new  NotFoundException("Удаляемый Фильм не найден");
+        }
     }
 }
