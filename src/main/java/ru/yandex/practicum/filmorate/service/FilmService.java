@@ -90,4 +90,13 @@ public class FilmService {
     public void deleteFilm(int filmId) {
         filmStorage.deleteFilmById(filmId);
     }
+
+    public List<Film> getCommonFilms(long userId, long friendId) {
+        userStorage.findById(userId); // Проверка, что пользователь существует
+        userStorage.findById(friendId); // Проверка, что друг существует
+
+        return filmStorage.findCommonFilms(userId, friendId).stream()
+                .sorted(new FilmComparatorByLikes().reversed())
+                .toList();
+    }
 }
