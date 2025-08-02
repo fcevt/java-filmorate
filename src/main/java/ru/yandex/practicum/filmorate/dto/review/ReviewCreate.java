@@ -7,12 +7,12 @@ import lombok.NonNull;
 
 @Data
 public class ReviewCreate {
-  @NotBlank
-  private String content;
-  @JsonProperty("isPositive")
-  private Boolean isPositive;
-  @NonNull
-  private Long userId;
-  @NonNull
-  private Long filmId;
+    @NotBlank
+    private String content;
+    @JsonProperty("isPositive")
+    private Boolean isPositive;
+    @NonNull
+    private Long userId;
+    @NonNull
+    private Long filmId;
 }

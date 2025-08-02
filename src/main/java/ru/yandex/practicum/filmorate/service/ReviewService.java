@@ -7,13 +7,10 @@ import ru.yandex.practicum.filmorate.dto.review.ReviewDTO;
 import ru.yandex.practicum.filmorate.dto.review.ReviewUpdate;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mappers.ReviewMapper;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Review;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.ReviewStorage;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,9 +29,9 @@ public class ReviewService {
 
     public List<ReviewDTO> getReviews(Long filmId, Integer count) {
         return reviewStorage.getMany(filmId).stream()
-               .map(review ->  ReviewMapper.mapToReviewDTO(review))
-               .limit( count == null ? DEFAULT_COUNT : count )
-               .toList();
+                .map(review -> ReviewMapper.mapToReviewDTO(review))
+                .limit(count == null ? DEFAULT_COUNT : count)
+                .toList();
     }
 
     public ReviewDTO create(ReviewCreate newReview) {
@@ -78,13 +75,13 @@ public class ReviewService {
     }
 
     public ReviewDTO update(ReviewUpdate reviewUpdate) {
-      Review reviewOld = reviewStorage
-              .get(reviewUpdate.getReviewId()).orElseThrow(() -> new NotFoundException("Отзыв не найден"));
-      Review review = ReviewMapper.updateRevievFields(reviewOld, reviewUpdate);
-      // проверки
-      filmService.getFilmById(review.getFilm());
-      userService.getUserById(review.getUser());
-      return ReviewMapper.mapToReviewDTO(reviewStorage.update(review));
+        Review reviewOld = reviewStorage
+                .get(reviewUpdate.getReviewId()).orElseThrow(() -> new NotFoundException("Отзыв не найден"));
+        Review review = ReviewMapper.updateRevievFields(reviewOld, reviewUpdate);
+        // проверки
+        filmService.getFilmById(review.getFilm());
+        userService.getUserById(review.getUser());
+        return ReviewMapper.mapToReviewDTO(reviewStorage.update(review));
     }
 
 }
