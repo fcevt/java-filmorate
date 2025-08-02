@@ -20,7 +20,7 @@ public class ReviewService {
     private final ReviewStorage reviewStorage;
     private static final short LIKE_VALUE = 1;
     private static final short DISLIKE_VALUE = -1;
-    private final static int DEFAULT_COUNT = 10;
+    private final int DEFAULT_COUNT = 10;
 
     public ReviewDTO getOneReview(Long id) {
         return ReviewMapper.mapToReviewDTO(
