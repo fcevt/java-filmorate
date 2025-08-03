@@ -66,7 +66,7 @@ public class ReviewService {
     }
 
     private void deleteLikeValue(Long id, Long userId, short value) {
-        if (reviewStorage.findExistLikeForReviewUserValue(id, userId, value))
+        if (!reviewStorage.findExistLikeForReviewUserValue(id, userId, value))
             throw new NotFoundException("Нечего удалять");
         reviewStorage.deleteLikeValue(id, userId, value);
     }
