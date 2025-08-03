@@ -54,8 +54,10 @@ public class ReviewRepository extends BaseRepository<Review> implements ReviewSt
     private static final String UPDATE_QUERY = "UPDATE reviews SET film_id = ?, user_id = ?, content = ?, " +
             "positiv = ? WHERE id = ?";
 
-    private static final String FIND_LIKE_BY_ID_UER =
+    private static final String FIND_LIKE_BY_ID_USER =
             "SELECT COUNT(*) FROM reviews_likes WHERE review_id = ? AND user_id = ?";
+    private static final String FIND_LIKE_BY_ID_USER_VALUE =
+            "SELECT COUNT(*) FROM reviews_likes WHERE review_id = ? AND user_id = ? AND like_value = ?";
     private static final String UPDATE_LIKE_VALUE =
             "UPDATE reviews_likes SET like_value = ? WHERE review_id = ? AND user_id = ?";
 
@@ -120,8 +122,14 @@ public class ReviewRepository extends BaseRepository<Review> implements ReviewSt
 
     @Override
     public boolean findExistLikeForReviewUser(Long review, Long user) {
-        return jdbc.queryForObject(FIND_LIKE_BY_ID_UER, Integer.class,
+        return jdbc.queryForObject(FIND_LIKE_BY_ID_USER, Integer.class,
                 new Object[]{review, user}) != 0;
+    }
+
+    @Override
+    public boolean findExistLikeForReviewUserValue(Long review, Long user, short value) {
+        return jdbc.queryForObject(FIND_LIKE_BY_ID_USER_VALUE, Integer.class,
+                new Object[]{review, user, value}) != 0;
     }
 
 }

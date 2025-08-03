@@ -66,7 +66,8 @@ public class ReviewService {
     }
 
     private void deleteLikeValue(Long id, Long userId, short value) {
-        //TODO : реализовать проверку наличия после реализации второй фичи
+        if (reviewStorage.findExistLikeForReviewUserValue(id, userId, value))
+            throw new NotFoundException("Нечего удалять");
         reviewStorage.deleteLikeValue(id, userId, value);
     }
 

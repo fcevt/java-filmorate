@@ -23,4 +23,6 @@ public interface ReviewStorage {
     void updateLikeValue(Long id, Long userId, short value);
 
     boolean findExistLikeForReviewUser(Long review, Long user);
+
+    boolean findExistLikeForReviewUserValue(Long review, Long user, short value);
 }
