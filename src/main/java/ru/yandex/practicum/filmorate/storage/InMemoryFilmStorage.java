@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -75,5 +76,10 @@ public class InMemoryFilmStorage implements FilmStorage {
                 .filter(film -> film.getLikes().contains(friendId))
                 .sorted(Comparator.comparingInt((Film film) -> film.getLikes().size()).reversed())
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Set<Long> findFilmLikes(User user) {
+        return new HashSet<>();
     }
 }
