@@ -63,6 +63,6 @@ CREATE TABLE IF NOT EXISTS reviews_likes (
     user_id BIGINT,
     like_value SMALLINT,
     FOREIGN KEY (review_id) REFERENCES reviews(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 --    CONSTRAINT unique_keys_reviews_likes UNIQUE(review_id, user_id)
 );
