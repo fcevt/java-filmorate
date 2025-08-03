@@ -166,13 +166,13 @@ public class UserRepository extends BaseRepository<User> implements UserStorage 
         int maxSimilarity = similarity.values().stream().max(Integer::compareTo).orElse(0); //находим максимальное значение количества пересечений
 
         if (maxSimilarity == 0) {
-            return Collections.emptyList();                             //
+            return Collections.emptyList();
         }
 
         List<User> mostSimilarUsers = similarity.entrySet().stream() // идем по записям пересечений, чтобы оставить максимально схожих юзеров
                 .filter(e -> e.getValue() == maxSimilarity) // пропускаем только те записи с кем совпадет максимальное количество пересечений
                 .map(Map.Entry::getKey)
-                .toList();                                          //
+                .toList();
 
         Set<Long> recommendedFilmIds = new HashSet<>();
         for (User similarUser : mostSimilarUsers) { // проходим по собранным максимально схожим юзерам
