@@ -31,6 +31,8 @@ public class Film {
     private MPA mpa;
     @EqualsAndHashCode.Exclude
     private Set<Genre> genres;
+    @EqualsAndHashCode.Exclude
+    private Set<Director> directors;
 
     public boolean hasDescription() {
         return description != null && !description.isEmpty();
@@ -54,5 +56,9 @@ public class Film {
 
     public boolean hasLikes() {
         return likes != null && !likes.isEmpty();
+    }
+
+    public boolean hasDirectors() {
+        return directors != null && !directors.isEmpty();
     }
 }

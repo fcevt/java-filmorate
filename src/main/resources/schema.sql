@@ -45,3 +45,14 @@ CREATE TABLE IF NOT EXISTS friendship (
     friend_id BIGINT REFERENCES users(user_id) ON DELETE CASCADE,
     status BOOLEAN
 );
+
+CREATE TABLE IF NOT EXISTS directors (
+    director_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    director_name VARCHAR NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS film_director (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    film_id BIGINT REFERENCES films(film_id) ON DELETE CASCADE,
+    director_id BIGINT REFERENCES directors(director_id) ON DELETE CASCADE
+);

@@ -17,7 +17,7 @@ import java.util.Set;
 
 public class FilmServiceTest {
     UserStorage userStorage = new InMemoryUserStorage();
-    FilmService filmService = new FilmService(new InMemoryFilmStorage(), userStorage);
+    FilmService filmService = new FilmService(new InMemoryFilmStorage(), userStorage, null);
     UserService userService = new UserService(userStorage);
 
 
