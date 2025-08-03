@@ -7,11 +7,14 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.dao.mappers.FilmExtractor;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 @Repository
 @Qualifier("filmDbStorage")
@@ -166,5 +169,11 @@ public class FilmRepository extends BaseRepository<Film> implements FilmStorage 
         if (!delete(DELETE_FILM_BY_ID_QUERY, filmId)) {
             throw new  NotFoundException("Удаляемый Фильм не найден");
         }
+    }
+
+    @Override
+    public Set<Long> findFilmLikes(User user) {
+        String sql = "SELECT film_id FROM likes WHERE user_id = ?";
+        return new HashSet<>(jdbc.queryForList(sql, Long.class, user.getId()));
     }
 }

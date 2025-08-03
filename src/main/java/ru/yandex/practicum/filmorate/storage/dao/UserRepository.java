@@ -5,12 +5,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.storage.dao.mappers.UserExtractor;
 
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 @Repository()
 @Qualifier("userDbStorage")
@@ -69,10 +70,13 @@ public class UserRepository extends BaseRepository<User> implements UserStorage 
             "ORDER BY u.user_id";
     private static final String DELETE_USER_BY_ID_QUERY = "DELETE FROM users WHERE user_id = ?";
     protected final UserExtractor userExtractor;
+    public FilmStorage filmStorage;
 
-    public UserRepository(JdbcTemplate jdbc, RowMapper<User> mapper, UserExtractor userExtractor) {
+    public UserRepository(JdbcTemplate jdbc, RowMapper<User> mapper, UserExtractor userExtractor,
+                          @Qualifier("filmDbStorage") FilmStorage filmStorage) {
         super(jdbc, mapper);
         this.userExtractor = userExtractor;
+        this.filmStorage = filmStorage;
     }
 
     public List<User> findAll() {
@@ -136,4 +140,50 @@ public class UserRepository extends BaseRepository<User> implements UserStorage 
             throw new NotFoundException("Удаляемый пользователь не найден");
         }
     }
+
+    public List<Film> getRecommendations(long userId) {
+        User targetUser = findById(userId);
+
+        Set<Long> targetLikes = new HashSet<>(filmStorage.findFilmLikes(targetUser)); // получаем лайки целевого юзера
+
+        Collection<User> allUsers = findAll().stream()     //получаем всех юзеров кроме целевого
+                .filter(u -> u.getId() != userId)
+                .toList();
+
+        Map<User, Integer> similarity = new HashMap<>(); // мапа для количества пересечений с каждым юзеров
+
+        for (User otherUser : allUsers) {
+            Set<Long> otherLikes = new HashSet<>(filmStorage.findFilmLikes(otherUser));// коллекция лайков каждого юзера
+            Set<Long> intersection = new HashSet<>(targetLikes); // коллекция лайков целевого юзера
+            intersection.retainAll(otherLikes); //оставляем только одинаковые с целевым юзером лайки
+            similarity.put(otherUser, intersection.size()); // кладем КОЛЛИЧЕСТВО общих с каждым юзером лайков в мапу
+        }
+
+        if (similarity.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        int maxSimilarity = similarity.values().stream().max(Integer::compareTo).orElse(0); //находим максимальное значение количества пересечений
+
+        if (maxSimilarity == 0) {
+            return Collections.emptyList();                             //
+        }
+
+        List<User> mostSimilarUsers = similarity.entrySet().stream() // идем по записям пересечений, чтобы оставить максимально схожих юзеров
+                .filter(e -> e.getValue() == maxSimilarity) // пропускаем только те записи с кем совпадет максимальное количество пересечений
+                .map(Map.Entry::getKey)
+                .toList();                                          //
+
+        Set<Long> recommendedFilmIds = new HashSet<>();
+        for (User similarUser : mostSimilarUsers) { // проходим по собранным максимально схожим юзерам
+            Set<Long> likes = filmStorage.findFilmLikes(similarUser); // получаем айди фильмов которые лайкнул каждый схожий юзер
+            likes.removeAll(targetLikes); // оставляем Только те айди фильмов, которых нет у целевого
+            recommendedFilmIds.addAll(likes);
+        }
+
+        return recommendedFilmIds.stream()
+                .map(filmStorage::findById)
+                .toList();
+    }
+
 }
