@@ -12,10 +12,7 @@ import ru.yandex.practicum.filmorate.model.MPA;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.dao.FilmRepository;
 import ru.yandex.practicum.filmorate.storage.dao.UserRepository;
-import ru.yandex.practicum.filmorate.storage.dao.mappers.FilmExtractor;
-import ru.yandex.practicum.filmorate.storage.dao.mappers.FilmRowMapper;
-import ru.yandex.practicum.filmorate.storage.dao.mappers.UserExtractor;
-import ru.yandex.practicum.filmorate.storage.dao.mappers.UserRowMapper;
+import ru.yandex.practicum.filmorate.storage.dao.mappers.*;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -28,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Import({UserRepository.class, UserRowMapper.class, UserExtractor.class, FilmRepository.class, FilmRowMapper.class,
-        FilmExtractor.class})
+        FilmExtractor.class, EventRowMapper.class})
 
 public class FilmoRateApplicationTests {
     private final UserRepository userStorage;
