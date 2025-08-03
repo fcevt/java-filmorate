@@ -6,8 +6,12 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.ReviewStorage;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+
+import static ru.yandex.practicum.filmorate.service.ReviewService.INSERT_EVENT_QUERY;
 
 @Repository
 public class ReviewRepository extends BaseRepository<Review> implements ReviewStorage {
@@ -72,7 +76,12 @@ public class ReviewRepository extends BaseRepository<Review> implements ReviewSt
                 review.getUser(),
                 review.getContent(),
                 review.isPositive()));
-
+        insert(INSERT_EVENT_QUERY,
+                Timestamp.from(Instant.now()),
+                review.getUser(),
+                "REVIEW",
+                "ADD",
+                review.getId());
         return review;
     }
 
@@ -91,17 +100,38 @@ public class ReviewRepository extends BaseRepository<Review> implements ReviewSt
 
     @Override
     public void delete(Long id) {
+        Review review = findOne(FIND_ONE, id).get();
         delete(DELETE, id);
+        insert(INSERT_EVENT_QUERY,
+                Timestamp.from(Instant.now()),
+                review.getUser(),
+                "REVIEW",
+                "REMOVE",
+                id);
     }
 
     @Override
     public void setLikeValue(Long id, Long userId, Integer value) {
         insert(INSERT_LIKE_VALUE, id, userId, value);
+        String operation = value > 1 ? "REMOVE" : "ADD";
+        insert(INSERT_EVENT_QUERY,
+                Timestamp.from(Instant.now()),
+                userId,
+                "LIKE",
+                operation,
+                id);
     }
 
     @Override
     public void deleteLikeValue(Long id, Long userId, Integer value) {
         delete(DELETE_LIKE_VALUE, id, userId, value);
+        String operation = value < 1 ? "REMOVE" : "ADD";
+        insert(INSERT_EVENT_QUERY,
+                Timestamp.from(Instant.now()),
+                userId,
+                "LIKE",
+                operation,
+                id);
     }
 
     @Override
@@ -112,12 +142,25 @@ public class ReviewRepository extends BaseRepository<Review> implements ReviewSt
                 review.getContent(),
                 review.isPositive(),
                 review.getId());
+        insert(INSERT_EVENT_QUERY,
+                Timestamp.from(Instant.now()),
+                review.getUser(),
+                "REVIEW",
+                "UPDATE",
+                review.getId());
         return review;
     }
 
     @Override
     public void updateLikeValue(Long id, Long userId, Integer value) {
         update(UPDATE_LIKE_VALUE, value, id, userId);
+        String operation = value < 1 ? "REMOVE" : "ADD";
+        insert(INSERT_EVENT_QUERY,
+                Timestamp.from(Instant.now()),
+                userId,
+                "LIKE",
+                operation,
+                id);
     }
 
     @Override

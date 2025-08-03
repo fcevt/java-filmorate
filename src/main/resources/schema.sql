@@ -76,3 +76,12 @@ CREATE TABLE IF NOT EXISTS reviews_likes (
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     CONSTRAINT unique_keys_reviews_likes UNIQUE(review_id, user_id)
 );
+
+CREATE TABLE IF NOT EXISTS feed (
+    event_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    timestamp TIMESTAMP,
+    user_id BIGINT,
+    event_type VARCHAR,
+    operation VARCHAR,
+    entity_id BIGINT
+);
