@@ -29,7 +29,7 @@ public class ReviewService {
 
     public List<ReviewDTO> getReviews(Long filmId, Integer count) {
         return reviewStorage.getMany(filmId).stream()
-                .map(review -> ReviewMapper.mapToReviewDTO(review))
+                .map(ReviewMapper::mapToReviewDTO)
                 .limit(count == null ? limit : count)
                 .toList();
     }
@@ -77,7 +77,7 @@ public class ReviewService {
     public ReviewDTO update(ReviewUpdate reviewUpdate) {
         Review reviewOld = reviewStorage
                 .get(reviewUpdate.getReviewId()).orElseThrow(() -> new NotFoundException("Отзыв не найден"));
-        Review review = ReviewMapper.updateRevievFields(reviewOld, reviewUpdate);
+        Review review = ReviewMapper.updateReviewFields(reviewOld, reviewUpdate);
         // проверки
         filmService.getFilmById(review.getFilm());
         userService.getUserById(review.getUser());

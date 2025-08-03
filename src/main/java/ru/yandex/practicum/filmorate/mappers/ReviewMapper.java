@@ -26,15 +26,9 @@ public class ReviewMapper {
                 .build();
     }
 
-    public static Review updateRevievFields(Review review, ReviewUpdate reviewUpdate) {
+    public static Review updateReviewFields(Review review, ReviewUpdate reviewUpdate) {
         if (reviewUpdate.hasContent())
             review.setContent(reviewUpdate.getContent());
-
-//        if (reviewUpdate.hasUserId())
-//            review.setUser(reviewUpdate.getUserId());
-//
-//        if (reviewUpdate.hasFilmId())
-//            review.setFilm(reviewUpdate.getFilmId());
 
         if (reviewUpdate.hasPositive())
             review.setPositive(reviewUpdate.getIsPositive());

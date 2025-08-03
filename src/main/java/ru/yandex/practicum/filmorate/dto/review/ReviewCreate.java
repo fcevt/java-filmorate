@@ -10,6 +10,7 @@ public class ReviewCreate {
     @NotBlank
     private String content;
     @JsonProperty("isPositive")
+    @NonNull
     private Boolean isPositive;
     @NonNull
     private Long userId;
