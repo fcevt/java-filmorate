@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS reviews_likes (
     id IDENTITY NOT NULL PRIMARY KEY,
     review_id BIGINT,
     user_id BIGINT,
-    like_value SMALLINT,
+    like_value INTEGER,
     FOREIGN KEY (review_id) REFERENCES reviews(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     CONSTRAINT unique_keys_reviews_likes UNIQUE(review_id, user_id)

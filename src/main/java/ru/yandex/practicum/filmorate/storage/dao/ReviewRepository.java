@@ -95,12 +95,12 @@ public class ReviewRepository extends BaseRepository<Review> implements ReviewSt
     }
 
     @Override
-    public void setLikeValue(Long id, Long userId, short value) {
+    public void setLikeValue(Long id, Long userId, Integer value) {
         insert(INSERT_LIKE_VALUE, id, userId, value);
     }
 
     @Override
-    public void deleteLikeValue(Long id, Long userId, short value) {
+    public void deleteLikeValue(Long id, Long userId, Integer value) {
         delete(DELETE_LIKE_VALUE, id, userId, value);
     }
 
@@ -116,7 +116,7 @@ public class ReviewRepository extends BaseRepository<Review> implements ReviewSt
     }
 
     @Override
-    public void updateLikeValue(Long id, Long userId, short value) {
+    public void updateLikeValue(Long id, Long userId, Integer value) {
         update(UPDATE_LIKE_VALUE, value, id, userId);
     }
 
@@ -127,7 +127,7 @@ public class ReviewRepository extends BaseRepository<Review> implements ReviewSt
     }
 
     @Override
-    public boolean findExistLikeForReviewUserValue(Long review, Long user, short value) {
+    public boolean findExistLikeForReviewUserValue(Long review, Long user, Integer value) {
         return jdbc.queryForObject(FIND_LIKE_BY_ID_USER_VALUE, Integer.class,
                 new Object[]{review, user, value}) != 0;
     }

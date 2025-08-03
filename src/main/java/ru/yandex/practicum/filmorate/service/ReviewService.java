@@ -18,8 +18,8 @@ public class ReviewService {
     private final UserService userService;
     private final FilmService filmService;
     private final ReviewStorage reviewStorage;
-    private static final short LIKE_VALUE = 1;
-    private static final short DISLIKE_VALUE = -1;
+    private static final Integer LIKE_VALUE = 1;
+    private static final Integer DISLIKE_VALUE = -1;
     private final int limit = 10;
 
     public ReviewDTO getOneReview(Long id) {
@@ -46,7 +46,7 @@ public class ReviewService {
         reviewStorage.delete(id);
     }
 
-    private void checkAndSetLikeValue(Long id, Long userId, short value) {
+    private void checkAndSetLikeValue(Long id, Long userId, Integer value) {
         reviewStorage.get(id).orElseThrow(() -> new NotFoundException("Отзыв не найден"));
         // проверка
         userService.getUserById(userId);
@@ -65,7 +65,7 @@ public class ReviewService {
         checkAndSetLikeValue(id, userId, DISLIKE_VALUE);
     }
 
-    private void deleteLikeValue(Long id, Long userId, short value) {
+    private void deleteLikeValue(Long id, Long userId, Integer value) {
         if (!reviewStorage.findExistLikeForReviewUserValue(id, userId, value))
             throw new NotFoundException("Нечего удалять");
         reviewStorage.deleteLikeValue(id, userId, value);

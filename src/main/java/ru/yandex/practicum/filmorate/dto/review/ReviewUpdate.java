@@ -13,7 +13,6 @@ public class ReviewUpdate {
     private Boolean isPositive;
     private Long userId;
     private Long filmId;
-//    private short useful;
 
     public boolean hasContent() {
         return !(content == null || content.isBlank());

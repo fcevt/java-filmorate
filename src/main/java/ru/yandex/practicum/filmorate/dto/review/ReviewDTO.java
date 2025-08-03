@@ -13,5 +13,5 @@ public class ReviewDTO {
     private boolean isPositive;
     private Long userId;
     private Long filmId;
-    private short useful;
+    private int useful;
 }

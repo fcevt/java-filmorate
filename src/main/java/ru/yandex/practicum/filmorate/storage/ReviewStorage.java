@@ -14,15 +14,15 @@ public interface ReviewStorage {
 
     void delete(Long id);
 
-    void setLikeValue(Long id, Long userId, short value);
+    void setLikeValue(Long id, Long userId, Integer value);
 
-    void deleteLikeValue(Long id, Long userId, short value);
+    void deleteLikeValue(Long id, Long userId, Integer value);
 
     Review update(Review review);
 
-    void updateLikeValue(Long id, Long userId, short value);
+    void updateLikeValue(Long id, Long userId, Integer value);
 
     boolean findExistLikeForReviewUser(Long review, Long user);
 
-    boolean findExistLikeForReviewUserValue(Long review, Long user, short value);
+    boolean findExistLikeForReviewUserValue(Long review, Long user, Integer value);
 }
