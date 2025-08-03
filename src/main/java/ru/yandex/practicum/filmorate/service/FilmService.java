@@ -125,4 +125,8 @@ public class FilmService {
                     .toList();
         }
     }
+
+    public List<Film> search(String query, String by) {
+        return null;
+    }
 }
