@@ -29,6 +29,8 @@ public class DirectorService {
     }
 
     public void deleteDirector(int id) {
-        directorRepository.delete(id);
+        if (!directorRepository.delete(id)) {
+            throw new NullPointerException("Режиссер с id: " + id + " не найден");
+        }
     }
 }
