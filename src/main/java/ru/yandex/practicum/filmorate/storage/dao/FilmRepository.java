@@ -13,6 +13,7 @@ import ru.yandex.practicum.filmorate.storage.dao.mappers.FilmExtractor;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 @Repository
 @Qualifier("filmDbStorage")
@@ -90,6 +91,9 @@ public class FilmRepository extends BaseRepository<Film> implements FilmStorage 
             "WHEN NOT MATCHED THEN " +
             "INSERT (film_id, director_id) VALUES (src.film_id, src.director_id)";
     private static final String DELETE_FILM_DIRECTORS_QUERY = "DELETE FROM film_director WHERE film_id = ?";
+    private static final String DIRECTOR = "director";
+    private static final String TITLE = "title";
+    private static final String SEARCH_TEMPLATE = "%s ILIKE '%%%s%%'";
 
     protected final FilmExtractor filmExtractor;
 
@@ -191,6 +195,27 @@ public class FilmRepository extends BaseRepository<Film> implements FilmStorage 
     @Override
     public List<Film> findCommonFilms(long userId, long friendId) {
         return jdbc.query(FIND_COMMON_FILMS_QUERY, filmExtractor, userId, friendId);
+    }
+
+    @Override
+    public List<Film> searchFilms(String query, String by) {
+        StringBuilder sqlQuery = new StringBuilder();
+        Set<String> params = Set.of(by.split(","));
+
+        if (params.contains(DIRECTOR))
+            sqlQuery.append(SEARCH_TEMPLATE.formatted("d.director_name", query));
+        if (params.contains(TITLE)) {
+            if (!sqlQuery.isEmpty())
+                sqlQuery.append(" OR ");
+            sqlQuery.append(SEARCH_TEMPLATE.formatted("f.film_name", query));
+        }
+
+        if (sqlQuery.isEmpty())
+            return List.of();
+
+        sqlQuery.insert(0, " WHERE ");
+        sqlQuery.insert(0, FIND_ALL_QUERY.substring(0, FIND_ALL_QUERY.indexOf("ORDER BY")));
+        return jdbc.query(sqlQuery.toString(), filmExtractor);
     }
 
     public void deleteFilmById(long filmId) {

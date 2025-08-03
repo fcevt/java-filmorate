@@ -21,4 +21,5 @@ public interface FilmStorage {
 
     List<Film> findCommonFilms(long userId, long friendId);
 
+    List<Film> searchFilms(String query, String by);
 }

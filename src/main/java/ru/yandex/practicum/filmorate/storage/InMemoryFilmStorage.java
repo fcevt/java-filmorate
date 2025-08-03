@@ -76,4 +76,9 @@ public class InMemoryFilmStorage implements FilmStorage {
                 .sorted(Comparator.comparingInt((Film film) -> film.getLikes().size()).reversed())
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<Film> searchFilms(String query, String by) {
+        return List.of();
+    }
 }
