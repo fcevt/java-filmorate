@@ -54,6 +54,11 @@ public class ReviewRepository extends BaseRepository<Review> implements ReviewSt
     private static final String UPDATE_QUERY = "UPDATE reviews SET film_id = ?, user_id = ?, content = ?, " +
             "positiv = ? WHERE id = ?";
 
+    private static final String FIND_LIKE_BY_ID_UER =
+            "SELECT COUNT(*) FROM reviews_likes WHERE review_id = ? AND user_id = ?";
+    private static final String UPDATE_LIKE_VALUE =
+            "UPDATE reviews_likes SET like_value = ? WHERE review_id = ? AND user_id = ?";
+
     public ReviewRepository(JdbcTemplate jdbc, RowMapper<Review> mapper) {
         super(jdbc, mapper);
     }
@@ -106,6 +111,17 @@ public class ReviewRepository extends BaseRepository<Review> implements ReviewSt
                 review.isPositive(),
                 review.getId());
         return review;
+    }
+
+    @Override
+    public void updateLikeValue(Long id, Long userId, short value) {
+        update(UPDATE_LIKE_VALUE, value, id, userId);
+    }
+
+    @Override
+    public boolean findExistLikeForReviewUser(Long review, Long user) {
+        return jdbc.queryForObject(FIND_LIKE_BY_ID_UER, Integer.class,
+                new Object[]{review, user}) != 0;
     }
 
 }
