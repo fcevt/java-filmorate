@@ -175,12 +175,16 @@ public class FilmRepository extends BaseRepository<Film> implements FilmStorage 
             "r.description AS mpa_description, " +
             "g.genre_name,  " +
             "l.user_id AS likes, " +
-            "fg.genre_id " +
+            "fg.genre_id, " +
+            "d.director_id, " +
+            "d.director_name " +
             "FROM films AS f " +
             "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
             "LEFT JOIN likes AS l ON l.film_id = f.film_id " +
             "LEFT JOIN film_genre AS fg ON fg.film_id = f.film_id " +
             "LEFT JOIN genre AS g ON g.genre_id = fg.genre_id " +
+            "LEFT JOIN film_director AS fd ON fd.film_id = f.film_id " +
+            "LEFT JOIN directors AS d ON d.director_id = fd.director_id " +
             "WHERE f.film_id IN (" +
             "SELECT l1.film_id FROM likes l1 WHERE l1.user_id = ? " +
             "INTERSECT " +
