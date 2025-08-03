@@ -16,7 +16,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import static ru.yandex.practicum.filmorate.service.ReviewService.INSERT_EVENT_QUERY;
+import static ru.yandex.practicum.filmorate.storage.dao.ReviewRepository.INSERT_EVENT_QUERY;
 
 @Repository
 @Qualifier("filmDbStorage")

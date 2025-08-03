@@ -20,10 +20,7 @@ public class ReviewService {
     private final ReviewStorage reviewStorage;
     private static final Integer LIKE_VALUE = 1;
     private static final Integer DISLIKE_VALUE = -1;
-    private final int limit = 10;
-    public static final String INSERT_EVENT_QUERY = "INSERT INTO feed" +
-            "(timestamp, user_id, event_type, operation, entity_id)" +
-            "VALUES (?, ?, ?, ?, ?)";
+    private static final int LIMIT = 10;
 
     public ReviewDTO getOneReview(Long id) {
         return ReviewMapper.mapToReviewDTO(
@@ -33,7 +30,7 @@ public class ReviewService {
     public List<ReviewDTO> getReviews(Long filmId, Integer count) {
         return reviewStorage.getMany(filmId).stream()
                 .map(ReviewMapper::mapToReviewDTO)
-                .limit(count == null ? limit : count)
+                .limit(count == null ? LIMIT : count)
                 .toList();
     }
 
@@ -42,7 +39,6 @@ public class ReviewService {
         userService.getUserById(newReview.getUserId());
         filmService.getFilmById(newReview.getFilmId());
         return ReviewMapper.mapToReviewDTO(reviewStorage.create(ReviewMapper.mapToReview(newReview)));
-        //тут создал ревью
     }
 
     public void delete(Long id) {
@@ -63,12 +59,10 @@ public class ReviewService {
 
     public void setLikeReview(Long id, Long userId) {
         checkAndSetLikeValue(id, userId, LIKE_VALUE);
-        //тут поставить лайк
     }
 
     public void setDisLikeReview(Long id, Long userId) {
         checkAndSetLikeValue(id, userId, DISLIKE_VALUE);
-        //тут удаление лайка
     }
 
     private void deleteLikeValue(Long id, Long userId, Integer value) {
@@ -79,12 +73,10 @@ public class ReviewService {
 
     public void deleteLike(Long id, Long userId) {
         deleteLikeValue(id, userId, LIKE_VALUE);
-        // тут удалить лайк с отзыва
     }
 
     public void deleteDisLike(Long id, Long userId) {
         deleteLikeValue(id, userId, DISLIKE_VALUE);
-        //тут поставил лайк
     }
 
     public ReviewDTO update(ReviewUpdate reviewUpdate) {
@@ -95,7 +87,6 @@ public class ReviewService {
         filmService.getFilmById(review.getFilm());
         userService.getUserById(review.getUser());
         return ReviewMapper.mapToReviewDTO(reviewStorage.update(review));
-        //тут апдейт отзыва
     }
 
 }

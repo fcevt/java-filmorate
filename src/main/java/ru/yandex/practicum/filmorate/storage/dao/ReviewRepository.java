@@ -11,8 +11,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
-import static ru.yandex.practicum.filmorate.service.ReviewService.INSERT_EVENT_QUERY;
-
 @Repository
 public class ReviewRepository extends BaseRepository<Review> implements ReviewStorage {
     private static final String INSERT_QUERY = "INSERT INTO reviews (film_id, user_id, content, positiv) " +
@@ -64,6 +62,9 @@ public class ReviewRepository extends BaseRepository<Review> implements ReviewSt
             "SELECT COUNT(*) FROM reviews_likes WHERE review_id = ? AND user_id = ? AND like_value = ?";
     private static final String UPDATE_LIKE_VALUE =
             "UPDATE reviews_likes SET like_value = ? WHERE review_id = ? AND user_id = ?";
+    public static final String INSERT_EVENT_QUERY = "INSERT INTO feed" +
+            "(timestamp, user_id, event_type, operation, entity_id)" +
+            "VALUES (?, ?, ?, ?, ?)";
 
     public ReviewRepository(JdbcTemplate jdbc, RowMapper<Review> mapper) {
         super(jdbc, mapper);
