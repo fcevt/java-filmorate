@@ -115,25 +115,11 @@ public class ReviewRepository extends BaseRepository<Review> implements ReviewSt
     @Override
     public void setLikeValue(Long id, Long userId, Integer value) {
         update(SET_LIKE_VALUE, id, userId, value);
-        String operation = value > 1 ? "REMOVE" : "ADD";
-        insert(INSERT_EVENT_QUERY,
-                Timestamp.from(Instant.now()),
-                userId,
-                "LIKE",
-                operation,
-                id);
     }
 
     @Override
     public void deleteLikeValue(Long id, Long userId, Integer value) {
         delete(DELETE_LIKE_VALUE, id, userId, value);
-        String operation = value < 1 ? "REMOVE" : "ADD";
-        insert(INSERT_EVENT_QUERY,
-                Timestamp.from(Instant.now()),
-                userId,
-                "LIKE",
-                operation,
-                id);
     }
 
     @Override
