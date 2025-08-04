@@ -45,8 +45,6 @@ public class ReviewRepository extends BaseRepository<Review> implements ReviewSt
             "FROM reviews AS r " +
             "ORDER BY useful DESC";
     private static final String DELETE = "DELETE FROM reviews WHERE id = ?";
-    private static final String INSERT_LIKE_VALUE = "INSERT INTO reviews_likes (review_id, user_id, like_value) " +
-            "VALUES(?, ?, ?)";
     private static final String SET_LIKE_VALUE = "MERGE INTO REVIEWS_LIKES AS T USING " +
             "    (VALUES (?, ?, ?)) AS S(REVIEW_ID, USER_ID, LIKE_VALUE) " +
             "    ON  T.REVIEW_ID = S.REVIEW_ID " +
@@ -59,13 +57,8 @@ public class ReviewRepository extends BaseRepository<Review> implements ReviewSt
             "AND like_value = ?";
     private static final String UPDATE_QUERY = "UPDATE reviews SET film_id = ?, user_id = ?, content = ?, " +
             "positiv = ? WHERE id = ?";
-
-//    private static final String FIND_LIKE_BY_ID_USER =
-//            "SELECT COUNT(*) FROM reviews_likes WHERE review_id = ? AND user_id = ?";
     private static final String FIND_LIKE_BY_ID_USER_VALUE =
             "SELECT COUNT(*) FROM reviews_likes WHERE review_id = ? AND user_id = ? AND like_value = ?";
-    private static final String UPDATE_LIKE_VALUE =
-            "UPDATE reviews_likes SET like_value = ? WHERE review_id = ? AND user_id = ?";
 
     public ReviewRepository(JdbcTemplate jdbc, RowMapper<Review> mapper) {
         super(jdbc, mapper);
@@ -102,7 +95,6 @@ public class ReviewRepository extends BaseRepository<Review> implements ReviewSt
 
     @Override
     public void setLikeValue(Long id, Long userId, Integer value) {
-        //insert(INSERT_LIKE_VALUE, id, userId, value);
         update(SET_LIKE_VALUE, id, userId, value);
     }
 
@@ -121,17 +113,6 @@ public class ReviewRepository extends BaseRepository<Review> implements ReviewSt
                 review.getId());
         return review;
     }
-
-    @Override
-    public void updateLikeValue(Long id, Long userId, Integer value) {
-        update(UPDATE_LIKE_VALUE, value, id, userId);
-    }
-
-//    @Override
-//    public boolean findExistLikeForReviewUser(Long review, Long user) {
-//        return jdbc.queryForObject(FIND_LIKE_BY_ID_USER, Integer.class,
-//                new Object[]{review, user}) != 0;
-//    }
 
     @Override
     public boolean findExistLikeForReviewUserValue(Long review, Long user, Integer value) {
