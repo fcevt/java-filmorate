@@ -50,11 +50,7 @@ public class ReviewService {
         reviewStorage.get(id).orElseThrow(() -> new NotFoundException("Отзыв не найден"));
         // проверка
         userService.getUserById(userId);
-
-        if (!reviewStorage.findExistLikeForReviewUser(id, userId))
-            reviewStorage.setLikeValue(id, userId, value);
-       else
-            reviewStorage.updateLikeValue(id, userId, value);
+        reviewStorage.setLikeValue(id, userId, value);
     }
 
     public void setLikeReview(Long id, Long userId) {
