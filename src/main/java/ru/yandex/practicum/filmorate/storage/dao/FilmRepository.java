@@ -212,28 +212,6 @@ public class FilmRepository extends BaseRepository<Film> implements FilmStorage 
         );
     }
 
-    private static final String FIND_COMMON_FILMS_QUERY = "SELECT f.film_id, " +
-            "f.film_name, " +
-            "f.description, " +
-            "f.duration, " +
-            "f.release_date, " +
-            "r.rating_id, " +
-            "r.code, " +
-            "r.description AS mpa_description, " +
-            "g.genre_name,  " +
-            "l.user_id AS likes, " +
-            "fg.genre_id " +
-            "FROM films AS f " +
-            "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
-            "LEFT JOIN likes AS l ON l.film_id = f.film_id " +
-            "LEFT JOIN film_genre AS fg ON fg.film_id = f.film_id " +
-            "LEFT JOIN genre AS g ON g.genre_id = fg.genre_id " +
-            "WHERE f.film_id IN (" +
-            "SELECT l1.film_id FROM likes l1 WHERE l1.user_id = ? " +
-            "INTERSECT " +
-            "SELECT l2.film_id FROM likes l2 WHERE l2.user_id = ?" +
-            ") " +
-            "ORDER BY f.film_id";
     private static final String FIND_FILM_LIKES = "SELECT film_id FROM likes WHERE user_id = ?";
 
     @Override

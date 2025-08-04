@@ -83,9 +83,7 @@ public class UserRepository extends BaseRepository<User> implements UserStorage 
     public FilmStorage filmStorage;
 
     public UserRepository(JdbcTemplate jdbc, RowMapper<User> mapper, UserExtractor userExtractor,
-                          EventRowMapper eventRowMapper) {
-    public UserRepository(JdbcTemplate jdbc, RowMapper<User> mapper, UserExtractor userExtractor,
-                          @Qualifier("filmDbStorage") FilmStorage filmStorage) {
+                          @Qualifier("filmDbStorage") FilmStorage filmStorage, EventRowMapper eventRowMapper) {
         super(jdbc, mapper);
         this.userExtractor = userExtractor;
         this.eventRowMapper = eventRowMapper;
