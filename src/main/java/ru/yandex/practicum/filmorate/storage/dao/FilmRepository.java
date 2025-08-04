@@ -14,13 +14,11 @@ import ru.yandex.practicum.filmorate.storage.dao.mappers.FilmExtractor;
 
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 
 import static ru.yandex.practicum.filmorate.storage.dao.ReviewRepository.INSERT_EVENT_QUERY;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Repository
 @Qualifier("filmDbStorage")
@@ -157,6 +155,8 @@ public class FilmRepository extends BaseRepository<Film> implements FilmStorage 
                 film.getMpa().getId());
         film.setId(id);
         if (film.hasGenres()) {
+            Set<Genre> sortedGenres = film.getGenres().stream().sorted(Comparator.comparing(Genre::getId)).collect(Collectors.toCollection(LinkedHashSet::new));
+            film.setGenres(sortedGenres);
             for (Genre genre : film.getGenres()) {
                 insert(INSERT_FILM_GENRE_QUERY, film.getId(), genre.getId());
             }
@@ -180,6 +180,9 @@ public class FilmRepository extends BaseRepository<Film> implements FilmStorage 
                 film.getMpa().getId(),
                 film.getId());
         if (film.hasGenres()) {
+            Set<Genre> sortedGenres = film.getGenres().stream().sorted(Comparator.comparing(Genre::getId))
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
+            film.setGenres(sortedGenres);
             delete(DELETE_FILM_GENRE_QUERY, film.getId());
             for (Genre genre : film.getGenres()) {
                 update(UPDATE_FILM_GENRE_QUERY, film.getId(), genre.getId());
