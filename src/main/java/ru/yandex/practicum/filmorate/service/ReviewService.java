@@ -20,7 +20,7 @@ public class ReviewService {
     private final ReviewStorage reviewStorage;
     private static final Integer LIKE_VALUE = 1;
     private static final Integer DISLIKE_VALUE = -1;
-    private final int limit = 10;
+    private static final int LIMIT = 10;
 
     public ReviewDTO getOneReview(Long id) {
         return ReviewMapper.mapToReviewDTO(
@@ -30,7 +30,7 @@ public class ReviewService {
     public List<ReviewDTO> getReviews(Long filmId, Integer count) {
         return reviewStorage.getMany(filmId).stream()
                 .map(ReviewMapper::mapToReviewDTO)
-                .limit(count == null ? limit : count)
+                .limit(count == null ? LIMIT : count)
                 .toList();
     }
 
