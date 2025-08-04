@@ -22,7 +22,7 @@ public interface ReviewStorage {
 
     void updateLikeValue(Long id, Long userId, Integer value);
 
-    boolean findExistLikeForReviewUser(Long review, Long user);
+    //boolean findExistLikeForReviewUser(Long review, Long user);
 
     boolean findExistLikeForReviewUserValue(Long review, Long user, Integer value);
 }

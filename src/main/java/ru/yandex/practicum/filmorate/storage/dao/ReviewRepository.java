@@ -47,15 +47,21 @@ public class ReviewRepository extends BaseRepository<Review> implements ReviewSt
     private static final String DELETE = "DELETE FROM reviews WHERE id = ?";
     private static final String INSERT_LIKE_VALUE = "INSERT INTO reviews_likes (review_id, user_id, like_value) " +
             "VALUES(?, ?, ?)";
-    private static final String MODIFY_LIKE_VALUE = "INSERT INTO reviews_likes (review_id, user_id, like_value) " +
-            "VALUES(?, ?, ?)";
+    private static final String SET_LIKE_VALUE = "MERGE INTO REVIEWS_LIKES AS T USING " +
+            "    (VALUES (?, ?, ?)) AS S(REVIEW_ID, USER_ID, LIKE_VALUE) " +
+            "    ON  T.REVIEW_ID = S.REVIEW_ID " +
+            "    AND T.USER_ID = S.USER_ID " +
+            "    WHEN MATCHED THEN " +
+            "        UPDATE SET T.LIKE_VALUE = S.LIKE_VALUE " +
+            "    WHEN NOT MATCHED THEN " +
+            "        INSERT (REVIEW_ID, USER_ID, LIKE_VALUE) VALUES (S.REVIEW_ID, S.USER_ID, S.LIKE_VALUE)";
     private static final String DELETE_LIKE_VALUE = "DELETE FROM reviews_likes WHERE review_id = ? AND user_id = ? " +
             "AND like_value = ?";
     private static final String UPDATE_QUERY = "UPDATE reviews SET film_id = ?, user_id = ?, content = ?, " +
             "positiv = ? WHERE id = ?";
 
-    private static final String FIND_LIKE_BY_ID_USER =
-            "SELECT COUNT(*) FROM reviews_likes WHERE review_id = ? AND user_id = ?";
+//    private static final String FIND_LIKE_BY_ID_USER =
+//            "SELECT COUNT(*) FROM reviews_likes WHERE review_id = ? AND user_id = ?";
     private static final String FIND_LIKE_BY_ID_USER_VALUE =
             "SELECT COUNT(*) FROM reviews_likes WHERE review_id = ? AND user_id = ? AND like_value = ?";
     private static final String UPDATE_LIKE_VALUE =
@@ -96,7 +102,8 @@ public class ReviewRepository extends BaseRepository<Review> implements ReviewSt
 
     @Override
     public void setLikeValue(Long id, Long userId, Integer value) {
-        insert(INSERT_LIKE_VALUE, id, userId, value);
+        //insert(INSERT_LIKE_VALUE, id, userId, value);
+        update(SET_LIKE_VALUE, id, userId, value);
     }
 
     @Override
@@ -120,11 +127,11 @@ public class ReviewRepository extends BaseRepository<Review> implements ReviewSt
         update(UPDATE_LIKE_VALUE, value, id, userId);
     }
 
-    @Override
-    public boolean findExistLikeForReviewUser(Long review, Long user) {
-        return jdbc.queryForObject(FIND_LIKE_BY_ID_USER, Integer.class,
-                new Object[]{review, user}) != 0;
-    }
+//    @Override
+//    public boolean findExistLikeForReviewUser(Long review, Long user) {
+//        return jdbc.queryForObject(FIND_LIKE_BY_ID_USER, Integer.class,
+//                new Object[]{review, user}) != 0;
+//    }
 
     @Override
     public boolean findExistLikeForReviewUserValue(Long review, Long user, Integer value) {
