@@ -125,4 +125,10 @@ public class FilmService {
                     .toList();
         }
     }
+
+    public List<Film> search(String query, String by) {
+        return filmStorage.searchFilms(query, by).stream()
+                .sorted((film1, film2) -> (film2.getLikes().size() - film1.getLikes().size()))
+                .toList();
+    }
 }

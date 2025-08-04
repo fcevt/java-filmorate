@@ -51,7 +51,7 @@ public class Film {
     }
 
     public boolean hasGenres() {
-        return genres != null && !genres.isEmpty();
+        return genres != null; //&& !genres.isEmpty();
     }
 
     public boolean hasLikes() {

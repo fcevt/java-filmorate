@@ -82,4 +82,9 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Set<Long> findFilmLikes(User user) {
         return new HashSet<>();
     }
+
+    @Override
+    public List<Film> searchFilms(String query, String by) {
+        return List.of();
+    }
 }

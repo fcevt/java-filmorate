@@ -20,6 +20,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 import static ru.yandex.practicum.filmorate.storage.dao.ReviewRepository.INSERT_EVENT_QUERY;
+import java.util.Set;
 
 @Repository
 @Qualifier("filmDbStorage")
@@ -123,6 +124,9 @@ public class FilmRepository extends BaseRepository<Film> implements FilmStorage 
             "SELECT l2.film_id FROM likes l2 WHERE l2.user_id = ?" +
             ") " +
             "ORDER BY f.film_id";
+    private static final String DIRECTOR = "director";
+    private static final String TITLE = "title";
+    private static final String SEARCH_TEMPLATE = "%s ILIKE '%%%s%%'";
 
     protected final FilmExtractor filmExtractor;
 
@@ -212,11 +216,53 @@ public class FilmRepository extends BaseRepository<Film> implements FilmStorage 
         );
     }
 
-    private static final String FIND_FILM_LIKES = "SELECT film_id FROM likes WHERE user_id = ?";
+    private static final String FIND_COMMON_FILMS_QUERY = "SELECT f.film_id, " +
+            "f.film_name, " +
+            "f.description, " +
+            "f.duration, " +
+            "f.release_date, " +
+            "r.rating_id, " +
+            "r.code, " +
+            "r.description AS mpa_description, " +
+            "g.genre_name,  " +
+            "l.user_id AS likes, " +
+            "fg.genre_id " +
+            "FROM films AS f " +
+            "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
+            "LEFT JOIN likes AS l ON l.film_id = f.film_id " +
+            "LEFT JOIN film_genre AS fg ON fg.film_id = f.film_id " +
+            "LEFT JOIN genre AS g ON g.genre_id = fg.genre_id " +
+            "WHERE f.film_id IN (" +
+            "SELECT l1.film_id FROM likes l1 WHERE l1.user_id = ? " +
+            "INTERSECT " +
+            "SELECT l2.film_id FROM likes l2 WHERE l2.user_id = ?" +
+            ") " +
+            "ORDER BY f.film_id";
 
     @Override
     public List<Film> findCommonFilms(long userId, long friendId) {
         return jdbc.query(FIND_COMMON_FILMS_QUERY, filmExtractor, userId, friendId);
+    }
+
+    @Override
+    public List<Film> searchFilms(String query, String by) {
+        StringBuilder sqlQuery = new StringBuilder();
+        Set<String> params = Set.of(by.split(","));
+
+        if (params.contains(DIRECTOR))
+            sqlQuery.append(SEARCH_TEMPLATE.formatted("d.director_name", query));
+        if (params.contains(TITLE)) {
+            if (!sqlQuery.isEmpty())
+                sqlQuery.append(" OR ");
+            sqlQuery.append(SEARCH_TEMPLATE.formatted("f.film_name", query));
+        }
+
+        if (sqlQuery.isEmpty())
+            return List.of();
+
+        sqlQuery.insert(0, " WHERE ");
+        sqlQuery.insert(0, FIND_ALL_QUERY.substring(0, FIND_ALL_QUERY.indexOf("ORDER BY")));
+        return jdbc.query(sqlQuery.toString(), filmExtractor);
     }
 
     public void deleteFilmById(long filmId) {
