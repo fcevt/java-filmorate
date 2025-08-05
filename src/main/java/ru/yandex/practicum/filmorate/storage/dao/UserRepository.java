@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.storage.dao.mappers.EventRowMapper;
+import ru.yandex.practicum.filmorate.storage.dao.mappers.FilmExtractor;
 import ru.yandex.practicum.filmorate.storage.dao.mappers.UserExtractor;
 import ru.yandex.practicum.filmorate.storage.dao.mappers.UserLikeExtractor;
 
@@ -87,19 +88,43 @@ public class UserRepository extends BaseRepository<User> implements UserStorage 
             "l.film_id " +
             "FROM users AS u " +
             "LEFT JOIN likes AS l ON u.user_id = l.user_id ";
+    private static final String GET_FILMS_FOR_RECOMMENDATION = "SELECT f.film_id, " +
+            "f.film_name, " +
+            "f.description, " +
+            "f.duration, " +
+            "f.release_date, " +
+            "r.rating_id, " +
+            "r.code, " +
+            "r.description AS mpa_description, " +
+            "g.genre_name,  " +
+            "l.user_id AS likes, " +
+            "fg.genre_id, " +
+            "d.director_id, " +
+            "d.director_name " +
+            "FROM films AS f " +
+            "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
+            "LEFT JOIN likes AS l ON l.film_id = f.film_id " +
+            "LEFT JOIN film_genre AS fg ON fg.film_id = f.film_id " +
+            "LEFT JOIN genre AS g ON g.genre_id = fg.genre_id " +
+            "LEFT JOIN film_director AS fd ON fd.film_id = f.film_id " +
+            "LEFT JOIN directors AS d ON d.director_id = fd.director_id " +
+            "WHERE f.film_id IN (%s)";
+//            " ORDER BY f.film_id";
     protected final UserExtractor userExtractor;
     protected  final EventRowMapper eventRowMapper;
-    public FilmStorage filmStorage;
+    protected FilmStorage filmStorage;
     protected final UserLikeExtractor userLikeExtractor;
+    protected final FilmExtractor filmExtractor;
 
     public UserRepository(JdbcTemplate jdbc, RowMapper<User> mapper, UserExtractor userExtractor,
                           @Qualifier("filmDbStorage") FilmStorage filmStorage, EventRowMapper eventRowMapper,
-                          UserLikeExtractor userLikeExtractor) {
+                          UserLikeExtractor userLikeExtractor, FilmExtractor filmExtractor) {
         super(jdbc, mapper);
         this.userExtractor = userExtractor;
         this.eventRowMapper = eventRowMapper;
         this.filmStorage = filmStorage;
         this.userLikeExtractor = userLikeExtractor;
+        this.filmExtractor = filmExtractor;
     }
 
     public List<User> findAll() {
@@ -216,13 +241,14 @@ public class UserRepository extends BaseRepository<User> implements UserStorage 
 
         Set<Long> recommendedFilmIds = new HashSet<>();
         for (User similarUser : mostSimilarUsers) {
-            Set<Long> likes = userLikes.get(similarUser); //filmStorage.findFilmLikes(similarUser);
+            Set<Long> likes = userLikes.get(similarUser);
             likes.removeAll(targetLikes);
             recommendedFilmIds.addAll(likes);
         }
 
-        return recommendedFilmIds.stream()
-                .map(filmStorage::findById)
-                .toList();
+        String newSql = String.join(",", Collections.nCopies(recommendedFilmIds.size(), "?"));
+        Object[] ids = recommendedFilmIds.toArray();
+
+        return jdbc.query(String.format(GET_FILMS_FOR_RECOMMENDATION, newSql), ids, filmExtractor);
     }
 }
