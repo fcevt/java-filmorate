@@ -12,6 +12,7 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.storage.dao.mappers.EventRowMapper;
 import ru.yandex.practicum.filmorate.storage.dao.mappers.UserExtractor;
+import ru.yandex.practicum.filmorate.storage.dao.mappers.UserLikeExtractor;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -78,16 +79,27 @@ public class UserRepository extends BaseRepository<User> implements UserStorage 
             "ORDER BY u.user_id";
     private static final String DELETE_USER_BY_ID_QUERY = "DELETE FROM users WHERE user_id = ?";
     private static final String GET_FEED_QUERY = "SELECT * FROM feed WHERE user_id = ?";
+    private static final String GET_USER_LIKES_QUERY = "SELECT u.user_id, " +
+            "u.username, " +
+            "u.login, " +
+            "u.email, " +
+            "u.birthday, " +
+            "l.film_id " +
+            "FROM users AS u " +
+            "LEFT JOIN likes AS l ON u.user_id = l.user_id ";
     protected final UserExtractor userExtractor;
     protected  final EventRowMapper eventRowMapper;
     public FilmStorage filmStorage;
+    protected final UserLikeExtractor userLikeExtractor;
 
     public UserRepository(JdbcTemplate jdbc, RowMapper<User> mapper, UserExtractor userExtractor,
-                          @Qualifier("filmDbStorage") FilmStorage filmStorage, EventRowMapper eventRowMapper) {
+                          @Qualifier("filmDbStorage") FilmStorage filmStorage, EventRowMapper eventRowMapper,
+                          UserLikeExtractor userLikeExtractor) {
         super(jdbc, mapper);
         this.userExtractor = userExtractor;
         this.eventRowMapper = eventRowMapper;
         this.filmStorage = filmStorage;
+        this.userLikeExtractor = userLikeExtractor;
     }
 
     public List<User> findAll() {
@@ -173,17 +185,15 @@ public class UserRepository extends BaseRepository<User> implements UserStorage 
 
     public List<Film> getRecommendations(long userId) {
         User targetUser = findById(userId);
+        Map<User, Set<Long>> userLikes = jdbc.query(GET_USER_LIKES_QUERY, userLikeExtractor);
 
-        Set<Long> targetLikes = new HashSet<>(filmStorage.findFilmLikes(targetUser));
+        Set<Long> targetLikes = userLikes.get(targetUser);
 
-        Collection<User> allUsers = findAll().stream()
-                .filter(u -> u.getId() != userId)
-                .toList();
-
+        List<User> allUsers = userLikes.keySet().stream().filter(u -> u.getId() != userId).toList();
         Map<User, Integer> similarity = new HashMap<>();
 
         for (User otherUser : allUsers) {
-            Set<Long> otherLikes = new HashSet<>(filmStorage.findFilmLikes(otherUser));
+            Set<Long> otherLikes = userLikes.get(otherUser);
             Set<Long> intersection = new HashSet<>(targetLikes);
             intersection.retainAll(otherLikes);
             similarity.put(otherUser, intersection.size());
@@ -206,7 +216,7 @@ public class UserRepository extends BaseRepository<User> implements UserStorage 
 
         Set<Long> recommendedFilmIds = new HashSet<>();
         for (User similarUser : mostSimilarUsers) {
-            Set<Long> likes = filmStorage.findFilmLikes(similarUser);
+            Set<Long> likes = userLikes.get(similarUser); //filmStorage.findFilmLikes(similarUser);
             likes.removeAll(targetLikes);
             recommendedFilmIds.addAll(likes);
         }
