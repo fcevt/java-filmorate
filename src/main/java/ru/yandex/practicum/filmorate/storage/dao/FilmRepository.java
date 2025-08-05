@@ -193,7 +193,7 @@ public class FilmRepository extends BaseRepository<Film> implements FilmStorage 
             for (Director director : film.getDirectors()) {
                 update(UPDATE_FILM_DIRECTOR_QUERY, film.getId(), director.getId());
             }
-        }
+        } else delete(DELETE_FILM_DIRECTORS_QUERY, film.getId());
 
         return film;
     }
