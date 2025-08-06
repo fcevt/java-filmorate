@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class FilmService {
-
+    private static final int COUNT = 10;
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
     private final DirectorRepository directorRepository;
@@ -77,7 +77,7 @@ public class FilmService {
         filmStorage.deleteLike(filmId, userId);
     }
 
-    public List<Film> getListOfPopularFilms(int count, Integer genreId, Integer year) {
+    public List<Film> getListOfPopularFilms(Integer count, Integer genreId, Integer year) {
         List<Film> films = filmStorage.findAll();
 
         List<Film> filterFilms = films.stream()
@@ -89,7 +89,7 @@ public class FilmService {
 
         return filterFilms.stream()
                 .sorted(new FilmComparatorByLikes().reversed())
-                .limit(count)
+                .limit(count != null && count > 0? count : COUNT)
                 .collect(Collectors.toList());
     }
 

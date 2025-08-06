@@ -15,12 +15,12 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ReviewService {
-    private final UserService userService;
-    private final FilmService filmService;
-    private final ReviewStorage reviewStorage;
     private static final Integer LIKE_VALUE = 1;
     private static final Integer DISLIKE_VALUE = -1;
     private static final int LIMIT = 10;
+    private final UserService userService;
+    private final FilmService filmService;
+    private final ReviewStorage reviewStorage;
 
     public ReviewDTO getOneReview(Long id) {
         return ReviewMapper.mapToReviewDTO(

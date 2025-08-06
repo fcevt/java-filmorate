@@ -1,11 +1,13 @@
 package ru.yandex.practicum.filmorate.mappers;
 
 
+import lombok.experimental.UtilityClass;
 import ru.yandex.practicum.filmorate.dto.review.ReviewCreate;
 import ru.yandex.practicum.filmorate.dto.review.ReviewDTO;
 import ru.yandex.practicum.filmorate.dto.review.ReviewUpdate;
 import ru.yandex.practicum.filmorate.model.Review;
 
+@UtilityClass
 public class ReviewMapper {
     public static Review mapToReview(ReviewCreate newReview) {
         return Review.builder()
