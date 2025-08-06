@@ -89,7 +89,7 @@ public class FilmService {
 
         return filterFilms.stream()
                 .sorted(new FilmComparatorByLikes().reversed())
-                .limit(count != null && count > 0? count : COUNT)
+                .limit(count != null && count > 0 ? count : COUNT)
                 .collect(Collectors.toList());
     }
 
