@@ -109,7 +109,6 @@ public class UserRepository extends BaseRepository<User> implements UserStorage 
             "LEFT JOIN film_director AS fd ON fd.film_id = f.film_id " +
             "LEFT JOIN directors AS d ON d.director_id = fd.director_id " +
             "WHERE f.film_id IN (%s)";
-//            " ORDER BY f.film_id";
     protected final UserExtractor userExtractor;
     protected  final EventRowMapper eventRowMapper;
     protected FilmStorage filmStorage;
